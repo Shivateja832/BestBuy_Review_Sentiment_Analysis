@@ -8,11 +8,13 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 - Live Best Buy data: **not bundled**. No review content is fabricated.
 - Site compliance: the collector rechecks robots.txt and requires the operator to confirm current terms and authorization. The Best Buy terms page was unavailable during preparation; independently verify it before collection.
 - Repository: source uploaded to `Shivateja832/BestBuy_Review_Sentiment_Analysis` on `main`.
-- Streamlit Community Cloud: app created from `main` / `app.py`. At last verification the public app showed **“Your app is in the oven”** with machine provisioning in progress; a successful app render has not yet been verified.
+- Streamlit Community Cloud: app created from `main` / `app.py`; the live page rendered the dashboard successfully.
 
 App URL: <https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/>
 
-At preparation time Best Buy robots.txt disallowed `/en-ca/search` and allowed `/en-ca/product/`. The UI and URL validator prohibit search URLs. Always verify the current robots rules and terms before running.
+The selected [Samsung WF45T6000AW/A5 washer product page](https://www.bestbuy.ca/en-ca/product/samsung-5-2-cu-ft-iec-front-load-washer-with-smart-care-and-self-clean-energy-star-wf45t6000aw-a5-white/14400381) showed 4,289 public reviews (4.57/5) when inspected on 2026-10-25. Its visible review route showed ten cards initially with sort and “Show More” controls. This count is a public-site display, not a claim that the application exported all 4,289 reviews.
+
+At preparation time Best Buy robots.txt disallowed `/en-ca/search` and allowed `/en-ca/product/`. The UI and URL validator prohibit search URLs. Always verify the current robots rules and terms before running. A local browser collection attempt encountered an access challenge/overlay and was stopped without evasion; no genuine output CSV is bundled.
 
 ## Quick start (Windows PowerShell)
 
@@ -29,7 +31,7 @@ For CSV-only analysis, upload a CSV containing a `review_text` column. Recommend
 
 1. Open Best Buy Canada’s current robots.txt and terms yourself. Do not run unless the route and intended use are allowed.
 2. Use a direct HTTPS `/en-ca/product/` page URL. Search and review submission URLs are rejected.
-3. Select one or more visible sort views and bounded pagination. Collection checks robots.txt, pauses between page actions, and reads visible review cards through Selenium.
+3. Select one or more visible sort views and bounded pagination. Collection checks robots.txt for the review route, pauses between page actions, and reads visible review cards through Selenium.
 4. Confirm the policy/authorization checkbox and run. If a visible control or review card cannot be found, collection reports an error instead of using a private API or bypass.
 
 The scraper intentionally does not rotate proxies, bypass CAPTCHAs, defeat rate limits, log in, or evade blocking. Stop when blocked. Sort coverage can overlap and the result is deduplicated. Page changes can break selectors; verify collected counts before using the data. Selenium requires Chrome; browser/driver setup is environment-dependent.
@@ -61,13 +63,14 @@ The app has been created in Community Cloud with:
 - Branch: `main`
 - Main file path: `app.py`
 
-Open the [app URL](https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/) to check startup. Hosted deployment is not considered verified until the dashboard renders instead of its provisioning screen. CSV upload and analysis need no browser binary; the optional Selenium collection requires Chrome/ChromeDriver, which is not verified in Community Cloud. Use local Chrome or Docker for that feature.
+Open the [app URL](https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/) to check startup. The live page rendered the dashboard during verification. `packages.txt` requests Chromium and its driver for optional Selenium collection; verify Cloud build logs because system package availability is host-dependent. CSV upload and sentiment analysis do not require browser binaries.
 
 ## Files
 
 - `app.py` — Streamlit user interface and exports.
 - `src/bestbuy_reviews.py` — robots-aware visible-page collector and parser.
 - `src/sentiment.py` — VADER scoring and data-derived insight helpers.
+- `packages.txt` — Chromium packages requested for Community Cloud.
 - `reports/stakeholder_report.md` — methods, risks, limitations, and recommendations.
 - `tests/` — focused tests for scraping parsing and sentiment labels.
 - `outputs/review_template.csv` — field-header template only, not scraped records.

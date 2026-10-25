@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import os
 import re
+import shutil
 import time
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -16,6 +17,7 @@ import pandas as pd
 from bs4 import BeautifulSoup, Tag
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver import ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as conditions
@@ -38,6 +40,8 @@ SORT_OPTIONS = (
     "Most Relevant",
 )
 DEFAULT_REVIEW_CARD_SELECTORS = (
+    "[data-automation='review-list-item']",
+    "li[class*='review_']",
     "[data-testid*='review-card']",
     "[data-review-id]",
     "article[class*='review']",
@@ -113,7 +117,15 @@ def _date_value(card: Tag) -> str:
     time_node = card.select_one("time[datetime], time")
     raw = (time_node.get("datetime") or _text(time_node)) if time_node else ""
     if not raw:
-        raw = _first_text(card, ["[class*='date']", "[data-testid*='date']"])
+        raw = _first_text(
+            card,
+            [
+                "[class*='locationAndTime']",
+                "[class*='date']",
+                "[data-testid*='date']",
+            ],
+        )
+    raw = re.sub(r"^[-–]\s*", "", raw)
     if not raw:
         return ""
     parsed = pd.to_datetime(raw, errors="coerce", utc=True)
@@ -122,7 +134,9 @@ def _date_value(card: Tag) -> str:
 
 def _rating_value(card: Tag) -> float | None:
     candidates: list[str] = []
-    for node in card.select("[aria-label], [data-rating], [class*='rating']"):
+    for node in card.select(
+        "[aria-label], [data-rating], [class*='rating'], p[class*='sr-only']"
+    ):
         for attribute in ("aria-label", "data-rating", "title"):
             value = node.get(attribute)
             if value:
@@ -174,10 +188,10 @@ def parse_review_cards(
             card,
             [
                 "[data-testid*='review-text']",
+                "[class*='reviewContent']",
                 "[class*='reviewText']",
                 "[class*='review-text']",
                 "[class*='comment']",
-                "p",
             ],
         )
         if not review_text:
@@ -193,13 +207,22 @@ def parse_review_cards(
                 "h2",
             ],
         )
-        reviewer_name = _first_text(
+        reviewer_text = _first_text(
             card,
             [
                 "[data-testid*='reviewer']",
-                "[class*='reviewer']",
                 "[class*='author']",
+                "[class*='reviewerInfo']",
+                "[class*='reviewer']",
             ],
+        )
+        reviewer_match = re.search(
+            r"\bReviewed by\s+(.+?)(?:\s+[-–]\s*|$)", reviewer_text, re.I
+        )
+        reviewer_name = (
+            reviewer_match.group(1).strip()
+            if reviewer_match
+            else reviewer_text.removeprefix("Verified Buyer").strip()
         )
         date_value = _date_value(card)
         rating = _rating_value(card)
@@ -215,7 +238,7 @@ def parse_review_cards(
         identity = external_id or "|".join(
             (product_url, date_value, title, review_text, reviewer_name)
         )
-        primary_key = external_id or hashlib.sha256(identity.encode("utf-8")).hexdigest()[:16]
+        primary_key = external_id or hashlib.sha256(identity.encode("utf-8")).hexdigest()
         records.append(
             {
                 "primary_key": primary_key,
@@ -277,9 +300,59 @@ def _click_show_more(driver: webdriver.Chrome) -> bool:
     )
     for element in candidates:
         if element.is_displayed() and "show more" in element.text.strip().casefold():
-            element.click()
+            driver.execute_script(
+                "arguments[0].scrollIntoView({block: 'center', inline: 'nearest'});",
+                element,
+            )
+            time.sleep(0.25)
+            try:
+                element.click()
+            except ElementClickInterceptedException as exc:
+                raise PermissionError(
+                    "The visible Show More control is blocked by a page overlay or consent "
+                    "dialog. Resolve it using the site's visible controls and retry; the scraper "
+                    "will not dismiss or bypass it."
+                ) from exc
             return True
     return False
+
+
+def _raise_if_access_denied(driver: webdriver.Chrome) -> None:
+    """Stop when visible page text indicates blocking or an access challenge."""
+    body_text = driver.find_element(By.TAG_NAME, "body").text.casefold()
+    markers = (
+        "access denied",
+        "you don't have permission to access",
+        "you do not have permission to access",
+        "unusual traffic",
+        "verify you are human",
+        "complete the captcha",
+    )
+    if any(marker in body_text for marker in markers):
+        raise PermissionError(
+            "Best Buy displayed an access-denied or challenge page. Collection stopped; "
+            "do not retry through proxies, CAPTCHA workarounds, or other evasion."
+        )
+
+
+def _chromium_binary() -> str | None:
+    binary = os.environ.get("CHROME_BIN")
+    if binary:
+        return binary
+    for candidate in ("chromium", "chromium-browser", "google-chrome", "chrome"):
+        binary = shutil.which(candidate)
+        if binary:
+            return binary
+    return None
+
+
+def _review_page_url(product_url: str) -> str:
+    """Resolve the public review page linked from a product page."""
+    parsed = urlparse(product_url)
+    path = parsed.path.rstrip("/")
+    if not path.lower().endswith("/review"):
+        path = f"{path}/review"
+    return parsed._replace(path=path, fragment="").geturl()
 
 
 def scrape_reviews(
@@ -290,6 +363,7 @@ def scrape_reviews(
 ) -> pd.DataFrame:
     """Scrape visible review cards from each selected public sort view."""
     product_url = validate_product_url(settings.product_url)
+    review_page_url = validate_product_url(_review_page_url(product_url))
     if not policy_confirmed:
         raise PermissionError(
             "Confirm that your use complies with Best Buy's current terms and applicable law."
@@ -301,16 +375,17 @@ def scrape_reviews(
     if not 1 <= settings.pause_seconds <= 30:
         raise ValueError("pause_seconds must be between 1 and 30.")
 
-    check_robots_permission(product_url)
+    check_robots_permission(review_page_url)
 
     options = ChromeOptions()
+    options.page_load_strategy = "eager"
     if headless:
         options.add_argument("--headless=new")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--window-size=1440,1000")
     options.add_argument(f"--user-agent={USER_AGENT}")
-    chrome_binary = os.environ.get("CHROME_BIN")
+    chrome_binary = _chromium_binary()
     if chrome_binary:
         options.binary_location = chrome_binary
     # Selenium Manager/Chrome are not allowed to work around access controls.
@@ -319,7 +394,8 @@ def scrape_reviews(
     collected: dict[str, dict[str, object]] = {}
     try:
         for sort_label in settings.sort_options:
-            driver.get(product_url)
+            driver.get(review_page_url)
+            _raise_if_access_denied(driver)
             try:
                 WebDriverWait(driver, settings.page_load_timeout).until(
                     lambda browser: bool(
@@ -336,6 +412,7 @@ def scrape_reviews(
             time.sleep(settings.pause_seconds)
 
             for page_number in range(settings.max_pages_per_sort):
+                _raise_if_access_denied(driver)
                 html = _visible_review_html(driver, settings.review_card_selector)
                 if not html:
                     raise RuntimeError(
@@ -360,6 +437,7 @@ def scrape_reviews(
                         != html
                     )
                 except TimeoutException as exc:
+                    _raise_if_access_denied(driver)
                     raise RuntimeError(
                         "The visible 'Show More' control did not load additional page content. "
                         "Collection stopped to avoid reporting an incomplete page as complete."

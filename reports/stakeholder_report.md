@@ -2,7 +2,7 @@
 
 ## Executive summary
 
-This application supports collection of review text visible on a public Best Buy Canada product page, transparent sentiment scoring, and export to CSV/Excel. No live review records are included: the Best Buy terms page could not be verified in this environment, and no product-specific scrape was performed. Accordingly, there are no product-level findings or satisfaction claims in this report. Run the workflow only after checking the current terms and robots.txt for the chosen URL.
+This application supports collection of review text visible on a public Best Buy Canada product page, transparent sentiment scoring, and export to CSV/Excel. The chosen Samsung WF45T6000AW/A5 washer page displayed 4,289 reviews and a 4.57/5 average on 2026-10-25; the linked review page exposed ten visible cards, five requested sort views, and a “Show More” control. These are observed public-page summary values, not a review-level analytical result. A local Selenium attempt encountered an access challenge/consent overlay; collection stopped without evasion, and no genuine review-level CSV or product sentiment findings are bundled.
 
 ## Method and data fields
 

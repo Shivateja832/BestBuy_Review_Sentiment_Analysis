@@ -10,6 +10,12 @@ from selenium.common.exceptions import WebDriverException
 from src.bestbuy_reviews import REVIEW_COLUMNS, SORT_OPTIONS, ScrapeSettings, scrape_reviews
 from src.sentiment import analyze_sentiment, build_insights, recommendations
 
+DEFAULT_PRODUCT_URL = (
+    "https://www.bestbuy.ca/en-ca/product/"
+    "samsung-5-2-cu-ft-iec-front-load-washer-with-smart-care-and-self-clean-energy-star-"
+    "wf45t6000aw-a5-white/14400381"
+)
+
 st.set_page_config(
     page_title="BestBuy Review Intelligence",
     page_icon="🛍️",
@@ -48,10 +54,10 @@ with st.sidebar:
     st.subheader("Optional public-page collection")
     product_url = st.text_input(
         "Direct Best Buy Canada product URL",
-        placeholder="https://www.bestbuy.ca/en-ca/product/…",
+        value=DEFAULT_PRODUCT_URL,
     )
     sort_options = st.multiselect("Sort views to collect", SORT_OPTIONS, default=["Most Helpful"])
-    max_pages = st.number_input("Show More pages per sort", min_value=1, max_value=100, value=5)
+    max_pages = st.number_input("Show More pages per sort", min_value=1, max_value=100, value=6)
     pause_seconds = st.slider("Pause between page actions (seconds)", 1.0, 10.0, 2.0, 0.5)
     acknowledge = st.checkbox(
         "I checked the current terms and robots.txt and am authorized to collect this public content."
