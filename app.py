@@ -63,8 +63,9 @@ with st.sidebar:
         "I checked the current terms and robots.txt and am authorized to collect this public content."
     )
     st.caption(
-        "No CAPTCHA bypass, proxy rotation, login, private API, or access-control evasion. "
-        "Scraping stops if policy cannot be checked."
+        "The collector selects Reject All for optional cookies when that visible site control "
+        "is available. No CAPTCHA bypass, proxy rotation, login, private API, or access-control "
+        "evasion; collection stops if a consent choice is unavailable or access is blocked."
     )
     scrape_button = st.button("Collect public reviews", type="primary", use_container_width=True)
 

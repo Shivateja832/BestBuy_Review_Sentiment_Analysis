@@ -34,7 +34,7 @@ For CSV-only analysis, upload a CSV containing a `review_text` column. Recommend
 3. Select one or more visible sort views and bounded pagination. Collection checks robots.txt for the review route, pauses between page actions, and reads visible review cards through Selenium.
 4. Confirm the policy/authorization checkbox and run. If a visible control or review card cannot be found, collection reports an error instead of using a private API or bypass.
 
-The scraper intentionally does not rotate proxies, bypass CAPTCHAs, defeat rate limits, log in, or evade blocking. Stop when blocked. Sort coverage can overlap and the result is deduplicated. Page changes can break selectors; verify collected counts before using the data. Selenium requires Chrome; browser/driver setup is environment-dependent.
+The scraper uses Best Buy's visible OneTrust “Reject All” control to decline optional cookies when a consent overlay is present. It does not accept optional cookies automatically. If no reject control is available, it stops and asks for a manual site preference. It never rotates proxies, bypasses CAPTCHAs, defeats rate limits, logs in, or evades blocking. Sort coverage can overlap and the result is deduplicated. Page changes can break selectors; verify collected counts before using the data. Selenium requires Chrome; browser/driver setup is environment-dependent.
 
 ## Notebook
 

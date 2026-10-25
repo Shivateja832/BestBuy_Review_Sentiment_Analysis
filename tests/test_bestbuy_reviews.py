@@ -1,4 +1,5 @@
 from src.bestbuy_reviews import (
+    _reject_optional_cookies,
     _raise_if_access_denied,
     _review_page_url,
     _visible_review_html,
@@ -46,6 +47,79 @@ def test_access_denied_response_stops_collection():
         assert "do not retry" in str(exc)
     else:
         raise AssertionError("Access denied page must stop collection.")
+
+
+def test_cookie_overlay_uses_visible_reject_all_control():
+    class Overlay:
+        def __init__(self, driver):
+            self.driver = driver
+
+        def is_displayed(self):
+            return self.driver.overlay_visible
+
+    class RejectButton:
+        text = "Reject All"
+
+        def __init__(self, driver):
+            self.driver = driver
+
+        def is_displayed(self):
+            return True
+
+        def is_enabled(self):
+            return True
+
+        def get_attribute(self, name):
+            return "onetrust-reject-all-handler" if name == "id" else None
+
+        def click(self):
+            self.driver.overlay_visible = False
+
+    class Driver:
+        overlay_visible = True
+
+        def find_elements(self, by, selector):
+            if selector == "#onetrust-pc-dark-filter":
+                return [Overlay(self)]
+            if selector == "#onetrust-reject-all-handler, #onetrust-banner-sdk button":
+                return [RejectButton(self)]
+            raise AssertionError(f"Unexpected selector: {selector}")
+
+    driver = Driver()
+    assert _reject_optional_cookies(driver, timeout=0.1) is True
+    assert driver.overlay_visible is False
+
+
+def test_cookie_overlay_without_reject_all_control_is_not_dismissed():
+    class Overlay:
+        def is_displayed(self):
+            return True
+
+    class Driver:
+        def find_elements(self, by, selector):
+            if selector == "#onetrust-pc-dark-filter":
+                return [Overlay()]
+            return []
+
+    try:
+        _reject_optional_cookies(Driver(), timeout=0)
+    except RuntimeError as exc:
+        assert "will not accept optional cookies" in str(exc)
+    else:
+        raise AssertionError("An unknown consent overlay must not be bypassed.")
+
+
+def test_no_cookie_overlay_does_not_change_consent():
+    class Overlay:
+        def is_displayed(self):
+            return False
+
+    class Driver:
+        def find_elements(self, by, selector):
+            assert selector == "#onetrust-pc-dark-filter"
+            return [Overlay()]
+
+    assert _reject_optional_cookies(Driver(), timeout=0) is False
 
 
 def test_parse_review_cards_extracts_required_public_fields():

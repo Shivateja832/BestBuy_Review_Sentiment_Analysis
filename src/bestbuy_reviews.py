@@ -293,7 +293,9 @@ def _select_sort(driver: webdriver.Chrome, label: str, timeout: int) -> None:
     )
 
 
-def _click_show_more(driver: webdriver.Chrome) -> bool:
+def _click_show_more(
+    driver: webdriver.Chrome, *, consent_retry: bool = False
+) -> bool:
     candidates = driver.find_elements(
         By.XPATH,
         "//*[self::button or self::a or @role='button']",
@@ -308,12 +310,71 @@ def _click_show_more(driver: webdriver.Chrome) -> bool:
             try:
                 element.click()
             except ElementClickInterceptedException as exc:
+                if not consent_retry and _reject_optional_cookies(driver):
+                    return _click_show_more(driver, consent_retry=True)
                 raise PermissionError(
                     "The visible Show More control is blocked by a page overlay or consent "
                     "dialog. Resolve it using the site's visible controls and retry; the scraper "
                     "will not dismiss or bypass it."
                 ) from exc
             return True
+    return False
+
+
+def _visible_consent_overlay(driver: webdriver.Chrome) -> bool:
+    overlays = driver.find_elements(By.CSS_SELECTOR, "#onetrust-pc-dark-filter")
+    return any(overlay.is_displayed() for overlay in overlays)
+
+
+def _reject_optional_cookies(driver: webdriver.Chrome, timeout: float = 5.0) -> bool:
+    """Use Best Buy's visible reject-all control when its OneTrust overlay is active."""
+    deadline = time.monotonic() + timeout
+    overlay_visible = _visible_consent_overlay(driver)
+    while overlay_visible:
+        candidates = driver.find_elements(
+            By.CSS_SELECTOR,
+            "#onetrust-reject-all-handler, #onetrust-banner-sdk button",
+        )
+        reject_button = next(
+            (
+                element
+                for element in candidates
+                if element.is_displayed()
+                and element.is_enabled()
+                and (
+                    element.get_attribute("id") == "onetrust-reject-all-handler"
+                    or re.fullmatch(
+                        r"reject all(?: optional)?(?: cookies)?",
+                        " ".join(element.text.split()).casefold(),
+                    )
+                    is not None
+                )
+            ),
+            None,
+        )
+        if reject_button:
+            reject_button.click()
+            while time.monotonic() < deadline:
+                if not _visible_consent_overlay(driver):
+                    return True
+                time.sleep(0.1)
+            if not _visible_consent_overlay(driver):
+                return True
+            raise RuntimeError(
+                "Best Buy's visible reject-optional-cookies control did not dismiss the "
+                "consent overlay. No collection was performed."
+            )
+        if time.monotonic() >= deadline:
+            break
+        time.sleep(0.1)
+        overlay_visible = _visible_consent_overlay(driver)
+
+    if overlay_visible:
+        raise RuntimeError(
+            "Best Buy is showing a cookie-consent overlay without a visible Reject All "
+            "control. Select the site's consent preference manually and retry; the scraper "
+            "will not accept optional cookies or dismiss the overlay."
+        )
     return False
 
 
@@ -396,6 +457,7 @@ def scrape_reviews(
         for sort_label in settings.sort_options:
             driver.get(review_page_url)
             _raise_if_access_denied(driver)
+            _reject_optional_cookies(driver)
             try:
                 WebDriverWait(driver, settings.page_load_timeout).until(
                     lambda browser: bool(
@@ -413,6 +475,7 @@ def scrape_reviews(
 
             for page_number in range(settings.max_pages_per_sort):
                 _raise_if_access_denied(driver)
+                _reject_optional_cookies(driver)
                 html = _visible_review_html(driver, settings.review_card_selector)
                 if not html:
                     raise RuntimeError(
