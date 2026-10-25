@@ -1,0 +1,11 @@
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+.env
+.streamlit/secrets.toml
+outputs/*
+!outputs/.gitkeep
+!outputs/review_template.csv
+*.py[cod]
+.DS_Store
