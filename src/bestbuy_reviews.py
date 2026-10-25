@@ -8,7 +8,6 @@ import re
 import shutil
 import time
 from dataclasses import dataclass
-from datetime import date, datetime
 from typing import Iterable
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
@@ -16,8 +15,7 @@ from urllib.robotparser import RobotFileParser
 import pandas as pd
 from bs4 import BeautifulSoup, Tag
 from selenium import webdriver
-from selenium.common.exceptions import TimeoutException
-from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.common.exceptions import ElementClickInterceptedException, TimeoutException
 from selenium.webdriver import ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as conditions

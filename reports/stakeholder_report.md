@@ -14,6 +14,7 @@ VADER compound polarity is mapped to Positive (>= 0.05), Negative (<= -0.05), or
 
 - Check the live `https://www.bestbuy.ca/robots.txt` before every run. At the time this application was prepared it disallowed search routes, including `/en-ca/search`, while allowing `/en-ca/product/`. Only direct product URLs are accepted.
 - The current terms page could not be verified during preparation. The operator must independently check current terms, applicable laws, and authorization and confirm this in the app.
+- If Best Buy displays its OneTrust consent overlay, the collector clicks only the visible “Reject All” control to decline optional cookies. It never auto-accepts optional cookies or hides the overlay; if the reject control is unavailable, it stops.
 - Respect page controls and visible review content only. The collector uses a bounded page count and a 1–30 second pause. It fails closed when robots.txt cannot be read.
 - For temporary connection failures only, use a small bounded retry with exponential delay and honor any `Retry-After` response. Do not retry or work around 403/429 responses, CAPTCHA, or access-denied screens; stop collection and seek permission.
 - Do not rotate proxies, bypass CAPTCHA, spoof identities, access accounts, call private endpoints, defeat rate limits, or work around access controls. If blocked, stop; reduce frequency, contact the site owner, or use an approved data source.

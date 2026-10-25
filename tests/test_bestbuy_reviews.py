@@ -1,4 +1,5 @@
 from src.bestbuy_reviews import (
+    _click_show_more,
     _reject_optional_cookies,
     _raise_if_access_denied,
     _review_page_url,
@@ -120,6 +121,71 @@ def test_no_cookie_overlay_does_not_change_consent():
             return [Overlay()]
 
     assert _reject_optional_cookies(Driver(), timeout=0) is False
+
+
+def test_show_more_retries_after_visible_reject_optional_cookies():
+    from selenium.common.exceptions import ElementClickInterceptedException
+
+    class ShowMore:
+        text = "Show More"
+
+        def __init__(self, driver):
+            self.driver = driver
+
+        def is_displayed(self):
+            return True
+
+        def click(self):
+            self.driver.show_more_clicks += 1
+            if self.driver.show_more_clicks == 1:
+                raise ElementClickInterceptedException("cookie consent overlay")
+
+    class Overlay:
+        def __init__(self, driver):
+            self.driver = driver
+
+        def is_displayed(self):
+            return self.driver.overlay_visible
+
+    class RejectAll:
+        text = "Reject All"
+
+        def __init__(self, driver):
+            self.driver = driver
+
+        def is_displayed(self):
+            return True
+
+        def is_enabled(self):
+            return True
+
+        def get_attribute(self, name):
+            return "onetrust-reject-all-handler" if name == "id" else None
+
+        def click(self):
+            self.driver.overlay_visible = False
+
+    class Driver:
+        overlay_visible = True
+        show_more_clicks = 0
+
+        def __init__(self):
+            self.show_more = ShowMore(self)
+
+        def find_elements(self, by, selector):
+            if selector == "#onetrust-pc-dark-filter":
+                return [Overlay(self)]
+            if selector == "#onetrust-reject-all-handler, #onetrust-banner-sdk button":
+                return [RejectAll(self)]
+            return [self.show_more]
+
+        def execute_script(self, script, element):
+            assert element is self.show_more
+
+    driver = Driver()
+    assert _click_show_more(driver) is True
+    assert driver.overlay_visible is False
+    assert driver.show_more_clicks == 2
 
 
 def test_parse_review_cards_extracts_required_public_fields():
