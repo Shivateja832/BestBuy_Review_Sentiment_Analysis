@@ -188,6 +188,42 @@ def test_show_more_retries_after_visible_reject_optional_cookies():
     assert driver.show_more_clicks == 2
 
 
+def test_show_more_reports_when_interceptor_is_not_consent_overlay():
+    from selenium.common.exceptions import ElementClickInterceptedException
+
+    class ShowMore:
+        text = "Show More"
+
+        def is_displayed(self):
+            return True
+
+        def click(self):
+            raise ElementClickInterceptedException("other overlay")
+
+    class Overlay:
+        def is_displayed(self):
+            return False
+
+    class Driver:
+        def find_elements(self, by, selector):
+            if selector == ".onetrust-pc-dark-filter":
+                return [Overlay()]
+            if selector == "#onetrust-reject-all-handler, #onetrust-banner-sdk button":
+                return []
+            return [ShowMore()]
+
+        def execute_script(self, script, element):
+            return None
+
+    try:
+        _click_show_more(Driver())
+    except PermissionError as exc:
+        assert ".onetrust-pc-dark-filter" in str(exc)
+        assert "not visible" in str(exc)
+    else:
+        raise AssertionError("A non-consent page overlay must be reported explicitly.")
+
+
 def test_parse_review_cards_extracts_required_public_fields():
     html = """
     <article class="review-item" data-review-id="R123">

@@ -311,10 +311,16 @@ def _click_show_more(
             except ElementClickInterceptedException as exc:
                 if not consent_retry and _reject_optional_cookies(driver):
                     return _click_show_more(driver, consent_retry=True)
+                overlay_detected = _visible_consent_overlay(driver)
+                if not overlay_detected:
+                    raise PermissionError(
+                        "Show More was intercepted, but the OneTrust consent overlay "
+                        f"({CONSENT_OVERLAY_SELECTOR}) is not visible. No consent choice was "
+                        "changed; another page overlay may be blocking the control."
+                    ) from exc
                 raise PermissionError(
-                    "The visible Show More control is blocked by a page overlay or consent "
-                    "dialog. Resolve it using the site's visible controls and retry; the scraper "
-                    "will not dismiss or bypass it."
+                    "Show More remains blocked after the visible Reject All control was used. "
+                    "Collection stopped without bypassing the page."
                 ) from exc
             return True
     return False
