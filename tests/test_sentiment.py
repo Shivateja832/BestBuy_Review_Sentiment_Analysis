@@ -37,3 +37,37 @@ def test_insights_are_data_derived_and_recommendations_are_nonempty():
     assert insights["review_count"] == 2
     assert insights["average_rating"] == 3.0
     assert recommendations(insights)
+
+
+def test_fifty_review_sentiment_workflow_smoke_test():
+    """Exercise the assignment's minimum sample through scoring and insight generation."""
+    reviews = pd.DataFrame(
+        [
+            {
+                "primary_key": f"test-{index:03}",
+                "title": "Smoke-test review",
+                "review_text": (
+                    "Quiet washer, excellent cleaning, and easy to use."
+                    if index < 35
+                    else "Noisy washer, poor cleaning, and disappointing results."
+                ),
+                "date": "2026-01-01",
+                "rating": 5 if index < 35 else 1,
+                "source": "synthetic test fixture",
+                "reviewer_name": "",
+            }
+            for index in range(50)
+        ]
+    )
+
+    analyzed = analyze_sentiment(reviews)
+    insights = build_insights(analyzed)
+
+    assert len(analyzed) == 50
+    assert {"sentiment_score", "sentiment", "sentiment_category"} <= set(analyzed.columns)
+    assert analyzed["sentiment"].value_counts().to_dict() == {"Positive": 35, "Negative": 15}
+    assert insights["review_count"] == 50
+    assert insights["average_rating"] == 3.8
+    assert insights["positive_share"] == 0.7
+    assert insights["negative_share"] == 0.3
+    assert recommendations(insights)
