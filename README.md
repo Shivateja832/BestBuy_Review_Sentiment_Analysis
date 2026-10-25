@@ -12,6 +12,8 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 
 App URL: <https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/>
 
+See [`reports/requirement_status.md`](./reports/requirement_status.md) for a requirement-by-requirement completion matrix. The public review count, synthetic tests, and working download controls do not count as a genuine 50-review export. Live Best Buy collection was not completed because the observed browser session returned access denial or a consent overlay without a visible Reject All control.
+
 The selected [Samsung WF45T6000AW/A5 washer product page](https://www.bestbuy.ca/en-ca/product/samsung-5-2-cu-ft-iec-front-load-washer-with-smart-care-and-self-clean-energy-star-wf45t6000aw-a5-white/14400381) showed 4,289 public reviews (4.57/5) when inspected on 2026-10-25. Its visible review route showed ten cards initially with sort and “Show More” controls. This count is a public-site display, not a claim that the application exported all 4,289 reviews.
 
 At preparation time Best Buy robots.txt disallowed `/en-ca/search` and allowed `/en-ca/product/`. The UI and URL validator prohibit search URLs. Always verify the current robots rules and terms before running. A local browser collection attempt encountered an access challenge/overlay and was stopped without evasion; no genuine output CSV is bundled.
