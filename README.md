@@ -8,7 +8,9 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 - Live Best Buy data: **not bundled**. No review content is fabricated.
 - Site compliance: the collector rechecks robots.txt and requires the operator to confirm current terms and authorization. The Best Buy terms page was unavailable during preparation; independently verify it before collection.
 - Repository: source uploaded to `Shivateja832/BestBuy_Review_Sentiment_Analysis` on `main`.
-- Streamlit Community Cloud: **not yet deployed**. The deployment page requires the repository owner's sign-in and app creation; no authenticated owner session is available here.
+- Streamlit Community Cloud: app created from `main` / `app.py`. At last verification the public app showed **“Your app is in the oven”** with machine provisioning in progress; a successful app render has not yet been verified.
+
+App URL: <https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/>
 
 At preparation time Best Buy robots.txt disallowed `/en-ca/search` and allowed `/en-ca/product/`. The UI and URL validator prohibit search URLs. Always verify the current robots rules and terms before running.
 
@@ -53,13 +55,13 @@ Then visit `http://localhost:8501`. Docker includes Chromium and ChromeDriver fo
 
 ## Streamlit Community Cloud
 
-The repository is ready for Community Cloud. The owner must sign in at [Streamlit Community Cloud](https://share.streamlit.io/) and create an app with:
+The app has been created in Community Cloud with:
 
 - Repository: `Shivateja832/BestBuy_Review_Sentiment_Analysis`
 - Branch: `main`
 - Main file path: `app.py`
 
-Or open the [pre-filled deployment page](https://share.streamlit.io/deploy?repository=Shivateja832%2FBestBuy_Review_Sentiment_Analysis&branch=main&mainModule=app.py). Hosted deployment is not complete until the owner completes this authenticated step and Streamlit reports the app as running. CSV upload and analysis need no browser binary; the optional Selenium collection requires Chrome/ChromeDriver, which is not verified in Community Cloud. Use local Chrome or Docker for that feature.
+Open the [app URL](https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/) to check startup. Hosted deployment is not considered verified until the dashboard renders instead of its provisioning screen. CSV upload and analysis need no browser binary; the optional Selenium collection requires Chrome/ChromeDriver, which is not verified in Community Cloud. Use local Chrome or Docker for that feature.
 
 ## Files
 
