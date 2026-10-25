@@ -25,7 +25,7 @@ python -m pip install -r requirements-dev.txt
 streamlit run app.py
 ```
 
-For CSV-only analysis, upload a CSV containing a `review_text` column. Recommended fields are `primary_key`, `title`, `review_text`, `date`, `rating`, `source`, and `reviewer_name`. The app creates sentiment score, sentiment, and sentiment category fields and offers CSV and Excel downloads.
+For CSV-only analysis, upload a CSV containing a `review_text` column. Empty or malformed files are reported clearly, and blank review rows are excluded before scoring. Recommended fields are `primary_key`, `title`, `review_text`, `date`, `rating`, `source`, and `reviewer_name`. The app creates sentiment score, sentiment, and sentiment category fields and offers CSV and Excel downloads.
 
 ## Optional review collection
 
@@ -34,7 +34,7 @@ For CSV-only analysis, upload a CSV containing a `review_text` column. Recommend
 3. Select one or more visible sort views and bounded pagination. Collection checks robots.txt for the review route, pauses between page actions, and reads visible review cards through Selenium.
 4. Confirm the policy/authorization checkbox and run. If a visible control or review card cannot be found, collection reports an error instead of using a private API or bypass.
 
-The scraper detects Best Buy's OneTrust overlay by its observed `onetrust-pc-dark-filter` **class** (not an ID) and uses the visible “Reject All” control to decline optional cookies. This distinction is required because the observed overlay has no matching `id`, so the earlier ID selector missed it and Show More remained intercepted. The scraper does not accept optional cookies automatically. If no reject control is available, it stops and asks for a manual site preference. It never rotates proxies, bypasses CAPTCHAs, defeats rate limits, logs in, or evades blocking. Sort coverage can overlap and the result is deduplicated. Page changes can break selectors; verify collected counts before using the data. Selenium requires Chrome; browser/driver setup is environment-dependent.
+The scraper detects Best Buy's OneTrust overlay by its observed `onetrust-pc-dark-filter` **class** (not an ID) and uses the visible “Reject All” control to decline optional cookies. It does not infer review IDs from generic `id` or `data-testid` attributes; where the page provides no explicit review ID it creates a content-derived key. If no visible Reject All control is available, it stops without making a consent choice; the app does not offer a supported manual consent flow in its browser session. It never accepts optional cookies automatically, rotates proxies, bypasses CAPTCHAs, defeats rate limits, logs in, or evades blocking. Sort coverage can overlap and the result is deduplicated. Page changes can break selectors; verify collected counts before using the data. Selenium requires Chrome; browser/driver setup is environment-dependent.
 
 ## Notebook
 

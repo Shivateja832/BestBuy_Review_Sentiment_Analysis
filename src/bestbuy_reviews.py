@@ -229,7 +229,7 @@ def parse_review_cards(
         external_id = next(
             (
                 str(card.get(attr))
-                for attr in ("data-review-id", "data-testid", "id")
+                for attr in ("data-review-id",)
                 if card.get(attr)
             ),
             "",
@@ -377,8 +377,8 @@ def _reject_optional_cookies(driver: webdriver.Chrome, timeout: float = 5.0) -> 
     if overlay_visible:
         raise RuntimeError(
             "Best Buy is showing a cookie-consent overlay without a visible Reject All "
-            "control. Select the site's consent preference manually and retry; the scraper "
-            "will not accept optional cookies or dismiss the overlay."
+            "control. Collection stopped without making a consent choice; this run cannot "
+            "continue safely without a visible site-provided control."
         )
     return False
 

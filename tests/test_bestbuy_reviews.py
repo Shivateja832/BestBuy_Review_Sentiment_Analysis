@@ -105,7 +105,7 @@ def test_cookie_overlay_without_reject_all_control_is_not_dismissed():
     try:
         _reject_optional_cookies(Driver(), timeout=0)
     except RuntimeError as exc:
-        assert "will not accept optional cookies" in str(exc)
+        assert "without making a consent choice" in str(exc)
     else:
         raise AssertionError("An unknown consent overlay must not be bypassed.")
 
@@ -296,3 +296,21 @@ def test_parse_bestbuy_review_list_markup():
     assert review["rating"] == 4.0
     assert review["reviewer_name"] == "Jordan"
     assert len(str(review["primary_key"])) == 64
+
+
+def test_repeated_data_testid_does_not_collapse_distinct_reviews():
+    html = """
+    <article id="review-card" data-testid="review-card">
+      <h3>Quiet operation</h3><p class="review-text">Runs quietly.</p>
+    </article>
+    <article id="review-card" data-testid="review-card">
+      <h3>Easy setup</h3><p class="review-text">Simple to install.</p>
+    </article>
+    """
+    reviews = parse_review_cards(
+        html,
+        "https://www.bestbuy.ca/en-ca/product/example/123",
+        review_card_selector="[data-testid='review-card']",
+    )
+    assert len(reviews) == 2
+    assert len({review["primary_key"] for review in reviews}) == 2

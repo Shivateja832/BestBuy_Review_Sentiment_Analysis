@@ -1,0 +1,37 @@
+name: Python checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m pytest -q
+      - name: Validate notebook and Python syntax
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          notebook = json.loads(
+              Path("BestBuy_Review_Sentiment_Analysis.ipynb").read_text(encoding="utf-8")
+          )
+          for index, cell in enumerate(notebook["cells"], start=1):
+              if cell["cell_type"] == "code":
+                  compile("".join(cell["source"]), f"notebook-cell-{index}", "exec")
+
+          for path in [Path("app.py"), *Path("src").glob("*.py"), *Path("tests").glob("*.py")]:
+              compile(path.read_text(encoding="utf-8"), str(path), "exec")
+          PY

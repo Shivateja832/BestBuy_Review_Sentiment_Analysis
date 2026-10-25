@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from io import BytesIO
-from pathlib import Path
 
 import pandas as pd
 import streamlit as st
@@ -9,6 +8,7 @@ from selenium.common.exceptions import WebDriverException
 
 from src.bestbuy_reviews import CONSENT_OVERLAY_SELECTOR
 from src.bestbuy_reviews import REVIEW_COLUMNS, SORT_OPTIONS, ScrapeSettings, scrape_reviews
+from src.data_io import load_review_csv
 from src.sentiment import analyze_sentiment, build_insights, recommendations
 
 DEFAULT_PRODUCT_URL = (
@@ -75,8 +75,9 @@ if "reviews" not in st.session_state:
     st.session_state.reviews = pd.DataFrame(columns=REVIEW_COLUMNS)
 if uploaded is not None:
     try:
-        st.session_state.reviews = pd.read_csv(uploaded)
-    except (pd.errors.ParserError, UnicodeDecodeError) as exc:
+        st.session_state.reviews = load_review_csv(uploaded)
+    except ValueError as exc:
+        st.session_state.reviews = pd.DataFrame(columns=REVIEW_COLUMNS)
         st.error(f"Could not read the selected CSV: {exc}")
 
 if scrape_button:
@@ -120,6 +121,12 @@ if raw_reviews.empty:
 
 if "review_text" not in raw_reviews:
     st.error("The input is missing the required `review_text` column.")
+    st.stop()
+
+raw_reviews["review_text"] = raw_reviews["review_text"].fillna("").astype(str)
+raw_reviews = raw_reviews.loc[raw_reviews["review_text"].str.strip().ne("")].copy()
+if raw_reviews.empty:
+    st.error("The input contains no non-empty review text to analyze.")
     st.stop()
 
 try:
@@ -197,4 +204,4 @@ download_right.download_button(
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 )
 
-st.caption(f"Application build: local · Dataset file: {Path('outputs').resolve()}")
+st.caption("Exports are generated for download; review data is not saved to the server.")
