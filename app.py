@@ -7,6 +7,7 @@ import pandas as pd
 import streamlit as st
 from selenium.common.exceptions import WebDriverException
 
+from src.bestbuy_reviews import CONSENT_OVERLAY_SELECTOR
 from src.bestbuy_reviews import REVIEW_COLUMNS, SORT_OPTIONS, ScrapeSettings, scrape_reviews
 from src.sentiment import analyze_sentiment, build_insights, recommendations
 
@@ -45,6 +46,7 @@ st.markdown(
     "<p>Policy-aware public review collection · transparent sentiment · actionable insights</p></div>",
     unsafe_allow_html=True,
 )
+st.caption(f"Collector consent-overlay selector: `{CONSENT_OVERLAY_SELECTOR}`")
 
 with st.sidebar:
     st.subheader("Data source")

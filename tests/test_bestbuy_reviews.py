@@ -80,7 +80,7 @@ def test_cookie_overlay_uses_visible_reject_all_control():
         overlay_visible = True
 
         def find_elements(self, by, selector):
-            if selector == "#onetrust-pc-dark-filter":
+            if selector == ".onetrust-pc-dark-filter":
                 return [Overlay(self)]
             if selector == "#onetrust-reject-all-handler, #onetrust-banner-sdk button":
                 return [RejectButton(self)]
@@ -98,7 +98,7 @@ def test_cookie_overlay_without_reject_all_control_is_not_dismissed():
 
     class Driver:
         def find_elements(self, by, selector):
-            if selector == "#onetrust-pc-dark-filter":
+            if selector == ".onetrust-pc-dark-filter":
                 return [Overlay()]
             return []
 
@@ -117,7 +117,7 @@ def test_no_cookie_overlay_does_not_change_consent():
 
     class Driver:
         def find_elements(self, by, selector):
-            assert selector == "#onetrust-pc-dark-filter"
+            assert selector == ".onetrust-pc-dark-filter"
             return [Overlay()]
 
     assert _reject_optional_cookies(Driver(), timeout=0) is False
@@ -173,7 +173,7 @@ def test_show_more_retries_after_visible_reject_optional_cookies():
             self.show_more = ShowMore(self)
 
         def find_elements(self, by, selector):
-            if selector == "#onetrust-pc-dark-filter":
+            if selector == ".onetrust-pc-dark-filter":
                 return [Overlay(self)]
             if selector == "#onetrust-reject-all-handler, #onetrust-banner-sdk button":
                 return [RejectAll(self)]

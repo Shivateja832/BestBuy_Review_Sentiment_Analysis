@@ -47,6 +47,7 @@ DEFAULT_REVIEW_CARD_SELECTORS = (
     "[class*='review-item']",
 )
 USER_AGENT = "BestBuyReviewSentimentAnalysis/1.0 (user-initiated public-page review export)"
+CONSENT_OVERLAY_SELECTOR = ".onetrust-pc-dark-filter"
 
 
 @dataclass(frozen=True)
@@ -320,7 +321,7 @@ def _click_show_more(
 
 
 def _visible_consent_overlay(driver: webdriver.Chrome) -> bool:
-    overlays = driver.find_elements(By.CSS_SELECTOR, "#onetrust-pc-dark-filter")
+    overlays = driver.find_elements(By.CSS_SELECTOR, CONSENT_OVERLAY_SELECTOR)
     return any(overlay.is_displayed() for overlay in overlays)
 
 
