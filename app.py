@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from io import BytesIO
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import streamlit as st
 from selenium.common.exceptions import WebDriverException
@@ -55,7 +56,7 @@ with st.sidebar:
         "Direct Best Buy Canada product URL",
         value=DEFAULT_PRODUCT_URL,
     )
-    sort_options = st.multiselect("Sort views to collect", SORT_OPTIONS, default=["Most Helpful"])
+    sort_options = st.multiselect("Sort views to collect", SORT_OPTIONS, default=["Most Relevant"])
     max_pages = st.number_input("Show More pages per sort", min_value=1, max_value=100, value=6)
     pause_seconds = st.slider("Pause between page actions (seconds)", 1.0, 10.0, 2.0, 0.5)
     acknowledge = st.checkbox(
@@ -120,6 +121,12 @@ if "review_text" not in raw_reviews:
     st.error("The input is missing the required `review_text` column.")
     st.stop()
 
+if "data_quality_note" in raw_reviews:
+    quality_notes = raw_reviews["data_quality_note"].dropna().astype(str).str.strip().unique()
+    for note in quality_notes:
+        if note:
+            st.warning(f"Dataset qualification: {note}")
+
 raw_reviews["review_text"] = raw_reviews["review_text"].fillna("").astype(str)
 raw_reviews = raw_reviews.loc[raw_reviews["review_text"].str.strip().ne("")].copy()
 if raw_reviews.empty:
@@ -157,7 +164,15 @@ with left:
     counts = analyzed["sentiment"].value_counts().reindex(
         ["Positive", "Neutral", "Negative"], fill_value=0
     )
-    st.bar_chart(counts, color="#2869c9")
+    figure, axis = plt.subplots(figsize=(6, 3.5))
+    bars = axis.bar(counts.index, counts.values, color=["#2869c9", "#8b98a9", "#d84a4a"])
+    axis.set_ylabel("Review count")
+    axis.spines[["top", "right"]].set_visible(False)
+    axis.bar_label(bars, padding=3)
+    axis.set_ylim(0, max(1, int(counts.max())) * 1.15)
+    figure.tight_layout()
+    st.pyplot(figure, use_container_width=True)
+    plt.close(figure)
 with right:
     st.subheader("Potential satisfaction drivers")
     positive_terms = insights["top_positive_terms"]

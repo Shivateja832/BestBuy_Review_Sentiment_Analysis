@@ -2,9 +2,9 @@
 
 ## Executive summary
 
-A 50-review sample was collected from the visible review cards on the ASUS CM14 14-inch Chromebook review page on 2026-10-26. The page displayed 434 total reviews. The sample's mean star rating is 4.50/5: 37 five-star, 7 four-star, 3 three-star, and 3 one-star reviews. These are sample statistics, not estimates for all 434 reviews.
+A 50-review sample was collected from the visible review cards on the ASUS CM14 14-inch Chromebook review page on 2026-10-26. The page displayed 434 total reviews and a 4.59/5 listing average. The sample's mean star rating is 4.50/5: 37 five-star, 7 four-star, 3 three-star, and 3 one-star reviews. These are sample statistics, not estimates for all 434 reviews.
 
-The review text most often praised everyday usability, screen, price/value, battery, and keyboard. The low-star reviews raised concerns about browser/software compatibility and administrator sign-in, camera access, screen failure/warranty, and battery life. These are issues to investigate, not proof of product-wide defect rates or causal drivers.
+**Important product-match caveat:** the listing is for a CM14 with MediaTek/Kompanio and 128GB storage, while 8 of the 50 captured review texts mention CX14, 7 mention Intel Celeron, 6 mention 64GB, only 1 mentions CM14, and none mention MediaTek, Kompanio, or 128GB. Treat the dataset as a sample attached to this listing, not verified CM14-specific customer feedback. The review text most often praised screen, price/value, battery, keyboard, and memory. Low-star reviews mentioned compatibility/sign-in, camera, screen/warranty, and battery concerns; these are investigation leads, not product defect estimates.
 
 ## Collection method and scope
 
@@ -16,6 +16,7 @@ The review text most often praised everyday usability, screen, price/value, batt
 - Record fields: primary key, title, review text, date, rating, source, reviewer name, product URL, collection sort, collection date, VADER score, raw text sentiment, final sentiment, and category.
 - No stable public review ID was exposed in the visible cards. The primary key is a deterministic SHA-256 digest of the product/page and available review fields. One card had no visible title; that value is blank, not fabricated.
 - The live sample was captured through visible browser interactions and processed with the project's Python sentiment/export code. A successful live run of the packaged Selenium collector itself has not been demonstrated.
+- Product mentions in the review text do not consistently match the listed product specifications; model-specific insights must not be presented as established findings.
 - The sample workbook and CSV are generated under `outputs/` and are git-ignored so reviewer names are not published in the public repository.
 
 ## Sentiment approach and results
@@ -61,7 +62,7 @@ This rule is a transparent heuristic, not a trained product-specific model. A hu
 - Do not rotate proxies, bypass CAPTCHA, use private endpoints, log in, reuse cookies, defeat rate limits, or automate around access-denied pages.
 - Use bounded page counts and pauses. Stop on 403/429, CAPTCHA, access denial, sign-in/OTP redirect, changed markup, or a blocked control. Do not treat retries as a way around a block.
 - The browser later redirected to an OTP sign-in page after sort interactions. No sign-in, one-time code, session cookie, or workaround was attempted.
-- The Selenium collector's live end-to-end success remains unverified. The 50 records in this report were captured via the visible public UI and processed locally.
+- The Selenium collector's live end-to-end success is not claimed. The 50 records in this report were captured via the visible public UI and processed locally.
 - Reviewer names are personal data. Keep exports access-controlled, share only when permitted, and consider anonymizing reviewer names in recruiter-facing copies.
 
 ## Deliverables and limitations
@@ -69,4 +70,5 @@ This rule is a transparent heuristic, not a trained product-specific model. A hu
 - Local review-level CSV: `outputs/asus_cm14_bestbuy_reviews_sentiment.csv`
 - Local Excel workbook: `outputs/asus_cm14_bestbuy_reviews_sentiment.xlsx` (Reviews, Insights, Recommendations, Collection sheets)
 - Python analysis application, visible-page Selenium collector, notebook, and tests are in the project.
-- This is a 50-card sample, not a complete export of 434 reviews. One title was unavailable in the source card. Current terms/authorization, reuse/redistribution permission, and deployment of the latest local changes remain to be verified.
+- This is a 50-card sample, not a complete export of 434 reviews. One title was unavailable in the source card, and review text indicates possible cross-model aggregation. Current terms and any required reuse/redistribution authorization are the operator's responsibility.
+- The requirement matrix gives the project a recruiter-style evidence score of 79/100, with deductions for field/model fit, lack of a live packaged-Selenium run, and the heuristic sentiment method.

@@ -6,7 +6,7 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 
 - Application: implemented and locally testable.
 - Genuine review sample: 50 visible ASUS CM14 reviews collected on 2026-10-26 and analyzed locally.
-- Data limitation: one review card had no visible title; it remains blank. The page exposed no review IDs, so deterministic SHA-256 keys are used.
+- Data-quality flags: one review card had no visible title; it remains blank. The page exposed no review IDs, so deterministic SHA-256 keys are used. Review text includes references to CX14/Intel Celeron/64GB hardware, while the selected listing is CM14/MediaTek/128GB; treat findings as listing-level until this fit is resolved.
 - Site compliance: collection used visible sort and Show More controls only, with no private API, login, proxy rotation, CAPTCHA bypass, or access-control evasion. Verify current terms and authorization before reuse or redistribution.
 - Repository: source uploaded to `Shivateja832/BestBuy_Review_Sentiment_Analysis` on `main`.
 - Streamlit Community Cloud: the post-push app loaded successfully; the ASUS default URL and sidebar collector controls were visible.
@@ -17,7 +17,7 @@ See [`reports/requirement_status.md`](./reports/requirement_status.md) for a req
 
 The [ASUS CM14 Chromebook review page](https://www.bestbuy.ca/en-ca/product/asus-cm14-14-chromebook-mediatek-kompanio-540-4gb-lpddr5x-128gb-emmc-chromeos-pure-grey/19826852/review) displayed 434 reviews when selected. The sample contains 50 distinct visible cards in the Most Relevant view, loaded in observed increments of 10 with the visible Show More control. All five requested sort labels were selected and confirmed on the live page. The sample is not an export of all 434 reviews.
 
-The generated CSV and Excel files are in `outputs/` on this workstation and are git-ignored to avoid publishing reviewer names. The workbook includes review results, insights, recommendations, and collection provenance. The sample mean rating is 4.50/5 (37 five-star, 7 four-star, 3 three-star, and 3 one-star reviews). The stakeholder report explains sentiment limitations and product-level caveats.
+The generated CSV and Excel files are in `outputs/` on this workstation and are git-ignored to avoid publishing reviewer names or full review text. The workbook includes review results, insights, recommendations, and collection provenance. The sample mean rating is 4.50/5 (37 five-star, 7 four-star, 3 three-star, and 3 one-star reviews). Because some review texts describe different model specifications, do not treat the sample as verified CM14-specific evidence; the stakeholder report explains this qualification.
 
 ## Quick start (Windows PowerShell)
 
