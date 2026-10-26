@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 from streamlit.testing.v1 import AppTest
 
@@ -24,7 +26,8 @@ def test_dashboard_analyzes_reviews_and_renders_exports_with_dataset_note():
         columns=REVIEW_COLUMNS + ["data_quality_note"],
     )
 
-    app = AppTest.from_file("app.py").run(timeout=30)
+    app_path = str(Path(__file__).resolve().parents[1] / "app.py")
+    app = AppTest.from_file(app_path).run(timeout=30)
     app.session_state["reviews"] = reviews
     app.run(timeout=30)
 
