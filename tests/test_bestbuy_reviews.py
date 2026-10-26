@@ -238,6 +238,7 @@ def test_parse_review_cards_extracts_required_public_fields():
     assert reviews[0] == {
         "primary_key": "R123",
         "title": "Great picture",
+        "title_source": "source",
         "review_text": "Bright and easy to set up.",
         "date": "2025-03-14",
         "rating": 5.0,
@@ -291,6 +292,7 @@ def test_parse_bestbuy_review_list_markup():
     assert len(reviews) == 1
     review = reviews[0]
     assert review["title"] == "Quiet and effective"
+    assert review["title_source"] == "source"
     assert review["review_text"] == "The washer runs quietly and cleans well."
     assert review["date"] == "2025-03-14"
     assert review["rating"] == 4.0
@@ -314,3 +316,26 @@ def test_repeated_data_testid_does_not_collapse_distinct_reviews():
     )
     assert len(reviews) == 2
     assert len({review["primary_key"] for review in reviews}) == 2
+
+
+def test_missing_source_title_gets_transparent_text_derived_title():
+    html = """
+    <article class="review-item" data-review-id="R456">
+      <p class="review-text">[This review was collected as part of a promotion.]
+        We've only been using this item for a couple of weeks, but so far so good.
+        Nothing fancy, but affordable and user friendly.</p>
+      <time datetime="2025-03-14T10:00:00Z">March 14, 2025</time>
+      <span aria-label="Rated 5 out of 5 stars"></span>
+      <span class="reviewer">Taylor</span>
+    </article>
+    """
+
+    review = parse_review_cards(
+        html,
+        "https://www.bestbuy.ca/en-ca/product/example/123",
+    )[0]
+
+    assert review["title"] == (
+        "We've only been using this item for a couple of weeks, but so far so good."
+    )
+    assert review["title_source"] == "generated_from_review_text"

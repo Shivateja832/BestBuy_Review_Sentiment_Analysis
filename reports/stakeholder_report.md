@@ -13,10 +13,10 @@ A 50-review sample was collected from the visible review cards on the ASUS CM14 
 - Review-page URL: <https://www.bestbuy.ca/en-ca/product/asus-cm14-14-chromebook-mediatek-kompanio-540-4gb-lpddr5x-128gb-emmc-chromeos-pure-grey/19826852/review>
 - Sort sample: Most Relevant; the public page's Most Helpful, Newest, Highest Rating, and Lowest Rating views were also selected and confirmed.
 - Pagination: visible Show More interaction increased the loaded cards 10 -> 20 -> 30 -> 40 -> 50.
-- Record fields: primary key, title, review text, date, rating, source, reviewer name, product URL, collection sort, collection date, VADER score, raw text sentiment, final sentiment, and category.
-- No stable public review ID was exposed in the visible cards. The primary key is a deterministic SHA-256 digest of the product/page and available review fields. One card had no visible title; that value is blank, not fabricated.
+- Record fields: primary key, display title, `title_source`, review text, date, rating, source, reviewer name, product URL, collection sort, collection date, VADER score, raw text sentiment, final sentiment, and category.
+- No stable public review ID was exposed in the visible cards. The primary key is a deterministic SHA-256 digest of the product/page and available review fields. One card had no source title; its display title is derived from the opening review sentence and `title_source` explicitly identifies that fallback.
 - The live sample was captured through visible browser interactions and processed with the project's Python sentiment/export code. A successful live run of the packaged Selenium collector itself has not been demonstrated.
-- Product mentions in the review text do not consistently match the listed product specifications; model-specific insights must not be presented as established findings.
+- A normal Best Buy search for a CX14 listing matching the review text returned HTTP 403 during the audit. No matching product page or review count could be verified, so model-specific insights must not be presented as established findings.
 - The sample workbook and CSV are generated under `outputs/` and are git-ignored so reviewer names are not published in the public repository.
 
 ## Sentiment approach and results
@@ -70,5 +70,5 @@ This rule is a transparent heuristic, not a trained product-specific model. A hu
 - Local review-level CSV: `outputs/asus_cm14_bestbuy_reviews_sentiment.csv`
 - Local Excel workbook: `outputs/asus_cm14_bestbuy_reviews_sentiment.xlsx` (Reviews, Insights, Recommendations, Collection sheets)
 - Python analysis application, visible-page Selenium collector, notebook, and tests are in the project.
-- This is a 50-card sample, not a complete export of 434 reviews. One title was unavailable in the source card, and review text indicates possible cross-model aggregation. Current terms and any required reuse/redistribution authorization are the operator's responsibility.
+- This is a 50-card sample, not a complete export of 434 reviews. One source title was unavailable and is transparently derived in the display field; review text indicates possible cross-model aggregation. Current terms and any required reuse/redistribution authorization are the operator's responsibility.
 - The requirement matrix gives the project a recruiter-style evidence score of 80/100, with deductions for field/model fit, lack of a live packaged-Selenium run, and the heuristic sentiment method.

@@ -6,7 +6,7 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 
 - Application: implemented and locally testable.
 - Genuine review sample: 50 visible ASUS CM14 reviews collected on 2026-10-26 and analyzed locally.
-- Data-quality flags: one review card had no visible title; it remains blank. The page exposed no review IDs, so deterministic SHA-256 keys are used. Review text includes references to CX14/Intel Celeron/64GB hardware, while the selected listing is CM14/MediaTek/128GB; treat findings as listing-level until this fit is resolved.
+- Data quality: the source exposed no review ID, so deterministic SHA-256 keys are used. One review card lacked a title; its display title is transparently derived from its text, and `title_source` marks that row as generated. Review text includes references to CX14/Intel Celeron/64GB hardware, while the selected listing is CM14/MediaTek/128GB; do not treat findings as verified CM14-specific evidence.
 - Site compliance: collection used visible sort and Show More controls only, with no private API, login, proxy rotation, CAPTCHA bypass, or access-control evasion. Verify current terms and authorization before reuse or redistribution.
 - Repository: source uploaded to `Shivateja832/BestBuy_Review_Sentiment_Analysis` on `main`.
 - Streamlit Community Cloud: the hosted app loaded successfully. A synthetic-only 50-row upload rendered analysis and downloads; removing it cleared the prior analysis and restored the empty state.
@@ -17,7 +17,7 @@ See [`reports/requirement_status.md`](./reports/requirement_status.md) for a req
 
 The [ASUS CM14 Chromebook review page](https://www.bestbuy.ca/en-ca/product/asus-cm14-14-chromebook-mediatek-kompanio-540-4gb-lpddr5x-128gb-emmc-chromeos-pure-grey/19826852/review) displayed 434 reviews when selected. The sample contains 50 distinct visible cards in the Most Relevant view, loaded in observed increments of 10 with the visible Show More control. All five requested sort labels were selected and confirmed on the live page. The sample is not an export of all 434 reviews.
 
-The generated CSV and Excel files are in `outputs/` on this workstation and are git-ignored to avoid publishing reviewer names or full review text. The workbook includes review results, insights, recommendations, and collection provenance. The sample mean rating is 4.50/5 (37 five-star, 7 four-star, 3 three-star, and 3 one-star reviews). Because some review texts describe different model specifications, do not treat the sample as verified CM14-specific evidence; the stakeholder report explains this qualification.
+The generated CSV and Excel files are in `outputs/` on this workstation and are git-ignored to avoid publishing reviewer names or full review text. The workbook includes review results, insights, recommendations, and collection provenance. The sample mean rating is 4.50/5 (37 five-star, 7 four-star, 3 three-star, and 3 one-star reviews). The Best Buy search for a product matching the CX14 review text returned 403 during this verification, so no replacement product or review count was inferred.
 
 ## Quick start (Windows PowerShell)
 
@@ -28,7 +28,7 @@ python -m pip install -r requirements-dev.txt
 streamlit run app.py
 ```
 
-For CSV-only analysis, upload a CSV containing a `review_text` column. Empty or malformed files are reported clearly, and blank review rows are excluded before scoring. Recommended fields are `primary_key`, `title`, `review_text`, `date`, `rating`, `source`, and `reviewer_name`. The app provides VADER text sentiment, a low-rating-aware final label, a sentiment category, and CSV/Excel downloads.
+For CSV-only analysis, upload a CSV containing a `review_text` column. Empty or malformed files are reported clearly, and blank review rows are excluded before scoring. Recommended fields are `primary_key`, `title`, `title_source`, `review_text`, `date`, `rating`, `source`, and `reviewer_name`. When a visible review card has no title, the collector derives a display title from review text and marks `title_source=generated_from_review_text`; the app shows a qualification notice. The app provides VADER text sentiment, a low-rating-aware final label, a sentiment category, and CSV/Excel downloads.
 
 ## Optional review collection
 

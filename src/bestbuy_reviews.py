@@ -24,6 +24,7 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 REVIEW_COLUMNS = [
     "primary_key",
     "title",
+    "title_source",
     "review_text",
     "date",
     "rating",
@@ -110,6 +111,20 @@ def _first_text(card: Tag, selectors: Iterable[str]) -> str:
         if value:
             return value
     return ""
+
+
+def _generated_title(review_text: str, max_length: int = 120) -> str:
+    """Create a clearly attributable display title when the source has none."""
+    text = re.sub(
+        r"^\[This review was collected as part of a promotion\.\]\s*",
+        "",
+        review_text,
+        flags=re.I,
+    ).strip()
+    sentence = re.split(r"(?<=[.!?])\s+", text, maxsplit=1)[0]
+    if len(sentence) <= max_length:
+        return sentence
+    return sentence[: max_length - 3].rsplit(" ", 1)[0] + "..."
 
 
 def _date_value(card: Tag) -> str:
@@ -206,6 +221,10 @@ def parse_review_cards(
                 "h2",
             ],
         )
+        title_source = "source"
+        if not title:
+            title = _generated_title(review_text)
+            title_source = "generated_from_review_text"
         reviewer_text = _first_text(
             card,
             [
@@ -242,6 +261,7 @@ def parse_review_cards(
             {
                 "primary_key": primary_key,
                 "title": title,
+                "title_source": title_source,
                 "review_text": review_text,
                 "date": date_value,
                 "rating": rating,

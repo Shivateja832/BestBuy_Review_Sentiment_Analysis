@@ -12,6 +12,9 @@ def test_dashboard_analyzes_reviews_and_renders_exports_with_dataset_note():
             {
                 "primary_key": f"sample-{index}",
                 "title": f"Review {index}",
+                "title_source": (
+                    "generated_from_review_text" if index == 0 else "source"
+                ),
                 "review_text": "Excellent screen and easy setup."
                 if index < 45
                 else "Broken screen and disappointing quality.",
@@ -39,6 +42,7 @@ def test_dashboard_analyzes_reviews_and_renders_exports_with_dataset_note():
         "Negative",
     ]
     assert any("Treat as a test sample." in warning.value for warning in app.warning)
+    assert any("1 display title(s) were derived" in item.value for item in app.info)
     assert len(app.get("download_button")) == 2
     assert any("meets the minimum 50-review threshold" in item.value for item in app.success)
 

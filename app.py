@@ -139,6 +139,15 @@ if "data_quality_note" in raw_reviews:
     for note in quality_notes:
         if note:
             st.warning(f"Dataset qualification: {note}")
+if "title_source" in raw_reviews:
+    generated_title_count = int(
+        raw_reviews["title_source"].eq("generated_from_review_text").sum()
+    )
+    if generated_title_count:
+        st.info(
+            f"{generated_title_count} display title(s) were derived from review text; "
+            "check the title_source column before treating them as source-provided titles."
+        )
 
 raw_reviews["review_text"] = raw_reviews["review_text"].fillna("").astype(str)
 raw_reviews = raw_reviews.loc[raw_reviews["review_text"].str.strip().ne("")].copy()
@@ -204,7 +213,7 @@ st.caption(
 
 st.subheader("Review-level results")
 preferred_columns = [
-    "primary_key", "title", "review_text", "date", "rating", "source",
+    "primary_key", "title", "title_source", "review_text", "date", "rating", "source",
     "reviewer_name", "sentiment_score", "text_sentiment", "sentiment",
     "sentiment_category",
 ]
