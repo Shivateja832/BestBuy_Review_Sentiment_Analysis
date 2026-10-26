@@ -22,6 +22,24 @@ def test_analyze_sentiment_adds_expected_fields_and_categories():
         "Mixed / Neutral",
     ]
     assert analyzed["sentiment_score"].between(-1, 1).all()
+    assert analyzed["text_sentiment"].tolist() == ["Positive", "Negative", "Neutral"]
+
+
+def test_low_rating_prevents_misleading_positive_sentiment_label():
+    review = pd.DataFrame(
+        {
+            "review_text": [
+                "I honestly do not like it. It runs super slow and constantly freezes."
+            ],
+            "rating": [1],
+        }
+    )
+
+    analyzed = analyze_sentiment(review)
+
+    assert analyzed.loc[0, "text_sentiment"] == "Positive"
+    assert analyzed.loc[0, "sentiment"] == "Negative"
+    assert analyzed.loc[0, "sentiment_category"] == "Poor Experience (Neg)"
 
 
 def test_insights_are_data_derived_and_recommendations_are_nonempty():

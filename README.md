@@ -5,18 +5,19 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 ## Status
 
 - Application: implemented and locally testable.
-- Live Best Buy data: **not bundled**. No review content is fabricated.
-- Site compliance: the collector rechecks robots.txt and requires the operator to confirm current terms and authorization. The Best Buy terms page was unavailable during preparation; independently verify it before collection.
+- Genuine review sample: 50 visible ASUS CM14 reviews collected on 2026-10-26 and analyzed locally.
+- Data limitation: one review card had no visible title; it remains blank. The page exposed no review IDs, so deterministic SHA-256 keys are used.
+- Site compliance: collection used visible sort and Show More controls only, with no private API, login, proxy rotation, CAPTCHA bypass, or access-control evasion. Verify current terms and authorization before reuse or redistribution.
 - Repository: source uploaded to `Shivateja832/BestBuy_Review_Sentiment_Analysis` on `main`.
-- Streamlit Community Cloud: app created from `main` / `app.py`; the live page rendered the dashboard successfully.
+- Streamlit Community Cloud: app created from `main` / `app.py`; the latest source revision requires a post-push redeployment check.
 
 App URL: <https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/>
 
-See [`reports/requirement_status.md`](./reports/requirement_status.md) for a requirement-by-requirement completion matrix. The public review count, synthetic tests, and working download controls do not count as a genuine 50-review export. Live Best Buy collection was not completed because the observed browser session returned access denial or a consent overlay without a visible Reject All control.
+See [`reports/requirement_status.md`](./reports/requirement_status.md) for a requirement-by-requirement completion matrix and [`reports/stakeholder_report.md`](./reports/stakeholder_report.md) for the sample analysis.
 
-The selected [Samsung WF45T6000AW/A5 washer product page](https://www.bestbuy.ca/en-ca/product/samsung-5-2-cu-ft-iec-front-load-washer-with-smart-care-and-self-clean-energy-star-wf45t6000aw-a5-white/14400381) showed 4,289 public reviews (4.57/5) when inspected on 2026-10-25. Its visible review route showed ten cards initially with sort and “Show More” controls. This count is a public-site display, not a claim that the application exported all 4,289 reviews.
+The [ASUS CM14 Chromebook review page](https://www.bestbuy.ca/en-ca/product/asus-cm14-14-chromebook-mediatek-kompanio-540-4gb-lpddr5x-128gb-emmc-chromeos-pure-grey/19826852/review) displayed 434 reviews when selected. The sample contains 50 distinct visible cards in the Most Relevant view, loaded in observed increments of 10 with the visible Show More control. All five requested sort labels were selected and confirmed on the live page. The sample is not an export of all 434 reviews.
 
-At preparation time Best Buy robots.txt disallowed `/en-ca/search` and allowed `/en-ca/product/`. The UI and URL validator prohibit search URLs. Always verify the current robots rules and terms before running. A local browser collection attempt encountered an access challenge/overlay and was stopped without evasion; no genuine output CSV is bundled.
+The generated CSV and Excel files are in `outputs/` on this workstation and are git-ignored to avoid publishing reviewer names. The workbook includes review results, insights, recommendations, and collection provenance. The sample mean rating is 4.50/5 (37 five-star, 7 four-star, 3 three-star, and 3 one-star reviews). The stakeholder report explains sentiment limitations and product-level caveats.
 
 ## Quick start (Windows PowerShell)
 
@@ -27,7 +28,7 @@ python -m pip install -r requirements-dev.txt
 streamlit run app.py
 ```
 
-For CSV-only analysis, upload a CSV containing a `review_text` column. Empty or malformed files are reported clearly, and blank review rows are excluded before scoring. Recommended fields are `primary_key`, `title`, `review_text`, `date`, `rating`, `source`, and `reviewer_name`. The app creates sentiment score, sentiment, and sentiment category fields and offers CSV and Excel downloads.
+For CSV-only analysis, upload a CSV containing a `review_text` column. Empty or malformed files are reported clearly, and blank review rows are excluded before scoring. Recommended fields are `primary_key`, `title`, `review_text`, `date`, `rating`, `source`, and `reviewer_name`. The app provides VADER text sentiment, a low-rating-aware final label, a sentiment category, and CSV/Excel downloads.
 
 ## Optional review collection
 
@@ -75,4 +76,5 @@ Open the [app URL](https://shivateja832-bestbuy-review-sentiment-analysis-app-bn
 - `packages.txt` — Chromium packages requested for Community Cloud.
 - `reports/stakeholder_report.md` — methods, risks, limitations, and recommendations.
 - `tests/` — focused tests for scraping parsing and sentiment labels.
-- `outputs/review_template.csv` — field-header template only, not scraped records.
+- `outputs/asus_cm14_bestbuy_reviews_sentiment.csv` and `.xlsx` — 50-record public-page sample and analysis, stored locally and git-ignored.
+- `outputs/review_template.csv` — field-header template.

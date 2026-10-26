@@ -12,8 +12,8 @@ from src.sentiment import analyze_sentiment, build_insights, recommendations
 
 DEFAULT_PRODUCT_URL = (
     "https://www.bestbuy.ca/en-ca/product/"
-    "samsung-5-2-cu-ft-iec-front-load-washer-with-smart-care-and-self-clean-energy-star-"
-    "wf45t6000aw-a5-white/14400381"
+    "asus-cm14-14-chromebook-mediatek-kompanio-540-4gb-lpddr5x-128gb-emmc-chromeos-"
+    "pure-grey/19826852"
 )
 
 st.set_page_config(
@@ -177,7 +177,8 @@ st.caption(
 st.subheader("Review-level results")
 preferred_columns = [
     "primary_key", "title", "review_text", "date", "rating", "source",
-    "reviewer_name", "sentiment_score", "sentiment", "sentiment_category",
+    "reviewer_name", "sentiment_score", "text_sentiment", "sentiment",
+    "sentiment_category",
 ]
 visible_columns = [column for column in preferred_columns if column in analyzed.columns]
 st.dataframe(analyzed[visible_columns], use_container_width=True, hide_index=True)

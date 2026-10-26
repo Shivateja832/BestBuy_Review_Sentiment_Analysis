@@ -28,12 +28,23 @@ STOP_WORDS = {
     "might", "more", "most", "not", "our", "out", "over", "really", "she", "some",
     "than", "that", "the", "their", "them", "then", "there", "they", "this",
     "too", "very", "was", "were", "what", "when", "which", "who", "will", "with",
-    "would", "you", "your",
+    "would", "you", "your", "able", "all", "another", "asus", "back", "basic", "best",
+    "buy", "bought", "business", "calls", "chromebook", "collected", "computer",
+    "considering", "day", "days", "decent", "device", "died", "don", "ever",
+    "everything", "experience", "far", "first", "four", "getting", "google", "great",
+    "good", "haven", "high", "however", "item", "items", "isn", "laptop", "less",
+    "look", "looking", "low", "make", "makes", "made", "many", "maybe", "month",
+    "months", "much", "need", "needed", "new", "now", "old", "one", "only", "part",
+    "pretty", "product", "products", "promotion", "purchased", "purchasing", "quick",
+    "recommend", "review", "reviews", "right", "runs", "say", "school", "set", "sign",
+    "something", "stars", "still", "student", "taken", "thank", "thanks", "thing",
+    "things", "time", "today", "tried", "try", "two", "use", "used", "using", "way",
+    "well", "within", "work", "works",
 }
 
 
 def analyze_sentiment(reviews: pd.DataFrame) -> pd.DataFrame:
-    """Add VADER compound score, sentiment label, and rating-aware category."""
+    """Add VADER text polarity and a low-rating-aware sentiment category."""
     if "review_text" not in reviews.columns:
         raise ValueError("Input data must contain a review_text column.")
     result = reviews.copy()
@@ -41,11 +52,13 @@ def analyze_sentiment(reviews: pd.DataFrame) -> pd.DataFrame:
     texts = result["review_text"].fillna("").astype(str)
     compound = texts.map(lambda text: analyzer.polarity_scores(text)["compound"])
     result["sentiment_score"] = compound.round(4)
-    result["sentiment"] = compound.map(
+    result["text_sentiment"] = compound.map(
         lambda score: "Positive" if score >= 0.05 else "Negative" if score <= -0.05 else "Neutral"
     )
 
     ratings = pd.to_numeric(result.get("rating", pd.Series(index=result.index, dtype=float)), errors="coerce")
+    result["sentiment"] = result["text_sentiment"]
+    result.loc[ratings.le(2), "sentiment"] = "Negative"
 
     def category(row: pd.Series) -> str:
         sentiment = str(row["sentiment"])

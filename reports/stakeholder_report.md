@@ -2,39 +2,71 @@
 
 ## Executive summary
 
-This application supports collection of review text visible on a public Best Buy Canada product page, transparent sentiment scoring, and export to CSV/Excel. The chosen Samsung WF45T6000AW/A5 washer page displayed 4,289 reviews and a 4.57/5 average on 2026-10-25; the linked review page exposed ten visible cards, five requested sort views, and a “Show More” control. These are observed public-page summary values, not a review-level analytical result. A local Selenium attempt encountered an access challenge/consent overlay; collection stopped without evasion, and no genuine review-level CSV or product sentiment findings are bundled.
+A 50-review sample was collected from the visible review cards on the ASUS CM14 14-inch Chromebook review page on 2026-10-26. The page displayed 434 total reviews. The sample's mean star rating is 4.50/5: 37 five-star, 7 four-star, 3 three-star, and 3 one-star reviews. These are sample statistics, not estimates for all 434 reviews.
 
-## Method and data fields
+The review text most often praised everyday usability, screen, price/value, battery, and keyboard. The low-star reviews raised concerns about browser/software compatibility and administrator sign-in, camera access, screen failure/warranty, and battery life. These are issues to investigate, not proof of product-wide defect rates or causal drivers.
 
-The collector uses Selenium to interact with visible sort controls and “Show More” pagination, and Beautiful Soup to read visible review-card markup. It supports Most Helpful, Newest, Highest Rating, Lowest Rating, and Most Relevant; records are deduplicated across sort views. The output fields are primary key, title, review text, date (YYYY-MM-DD when parseable), rating (1–5), source, and reviewer name. Missing page fields remain blank rather than being fabricated.
+## Collection method and scope
 
-VADER compound polarity is mapped to Positive (>= 0.05), Negative (<= -0.05), or Neutral. Rating-aware labels provide example categories such as “Good Design Quality (Pos)” and “Poor Experience (Neg).” The sentiment model is a general-purpose English lexicon; sarcasm, mixed-language reviews, and domain-specific terms can lead to errors. Validate a human-coded sample before operational decisions.
+- Product: ASUS CM14 14-inch Chromebook, Pure Grey.
+- Product URL: <https://www.bestbuy.ca/en-ca/product/asus-cm14-14-chromebook-mediatek-kompanio-540-4gb-lpddr5x-128gb-emmc-chromeos-pure-grey/19826852>
+- Review-page URL: <https://www.bestbuy.ca/en-ca/product/asus-cm14-14-chromebook-mediatek-kompanio-540-4gb-lpddr5x-128gb-emmc-chromeos-pure-grey/19826852/review>
+- Sort sample: Most Relevant; the public page's Most Helpful, Newest, Highest Rating, and Lowest Rating views were also selected and confirmed.
+- Pagination: visible Show More interaction increased the loaded cards 10 -> 20 -> 30 -> 40 -> 50.
+- Record fields: primary key, title, review text, date, rating, source, reviewer name, product URL, collection sort, collection date, VADER score, raw text sentiment, final sentiment, and category.
+- No stable public review ID was exposed in the visible cards. The primary key is a deterministic SHA-256 digest of the product/page and available review fields. One card had no visible title; that value is blank, not fabricated.
+- The live sample was captured through visible browser interactions and processed with the project's Python sentiment/export code. A successful live run of the packaged Selenium collector itself has not been demonstrated.
+- The sample workbook and CSV are generated under `outputs/` and are git-ignored so reviewer names are not published in the public repository.
 
-## Scraping constraints and challenges
+## Sentiment approach and results
 
-- Check the live `https://www.bestbuy.ca/robots.txt` before every run. At the time this application was prepared it disallowed search routes, including `/en-ca/search`, while allowing `/en-ca/product/`. Only direct product URLs are accepted.
-- The current terms page could not be verified during preparation. The operator must independently check current terms, applicable laws, and authorization and confirm this in the app.
-- If Best Buy displays its OneTrust consent overlay, the collector clicks only the visible “Reject All” control to decline optional cookies. It never auto-accepts optional cookies or hides the overlay; if the reject control is unavailable, it stops without offering an unsupported manual retry.
-- The overlay is identified by the observed `onetrust-pc-dark-filter` class, not an ID; Best Buy's rendered overlay had no `id`, which caused the prior detection to miss the actual click interceptor.
-- Respect page controls and visible review content only. The collector uses a bounded page count and a 1–30 second pause. It fails closed when robots.txt cannot be read.
-- For temporary connection failures only, use a small bounded retry with exponential delay and honor any `Retry-After` response. Do not retry or work around 403/429 responses, CAPTCHA, or access-denied screens; stop collection and seek permission.
-- Do not rotate proxies, bypass CAPTCHA, spoof identities, access accounts, call private endpoints, defeat rate limits, or work around access controls. If blocked, stop; reduce frequency, contact the site owner, or use an approved data source.
-- Page markup and sort labels can change. The collector reports missing controls instead of silently claiming complete coverage. Review the output count and compare with the site's displayed count; pagination caps mean the export may be partial.
-- Selenium requires a compatible Chrome installation. Selenium Manager may resolve a driver for normal browser operation; do not use it to circumvent blocking or access restrictions.
-- Export only fields needed for analysis. Reviewer names are personal data; omit or pseudonymize them for sharing, apply retention limits, and follow applicable privacy rules.
+VADER produces a text-only compound score from -1 to +1 and a `text_sentiment` label. During validation, VADER gave a positive score to a clearly one-star complaint mentioning slow performance and freezing. To avoid labeling a 1–2 star review as favorable, the final `sentiment` field applies a documented low-rating override: ratings of 1 or 2 are Negative; other reviews use the VADER threshold (>= 0.05 Positive, <= -0.05 Negative, otherwise Neutral). Both the raw text label and final label are retained for audit.
 
-## Stakeholder insight framework
+| Final sentiment | Reviews | Share |
+|---|---:|---:|
+| Positive | 43 | 86% |
+| Negative | 5 | 10% |
+| Neutral | 2 | 4% |
 
-After collection, use the dashboard to review average rating, positive/neutral/negative shares, and high-frequency terms within positive and negative reviews. Treat these as exploratory signals rather than causal findings. A strength term is a potential satisfaction driver; a repeated negative term is a hypothesis requiring review-level validation.
+This rule is a transparent heuristic, not a trained product-specific model. A human-coded sample is needed before decisions, especially for mixed-language, sarcastic, or contradictory text/rating records.
+
+## Potential drivers and recommended actions
+
+### Satisfaction signals observed
+
+- Screen/display quality and keyboard usability are recurring positive comments.
+- Value/price, ease of setup, and suitability for basic school, browsing, and streaming tasks are also mentioned.
+- Battery is a mixed theme: some customers liked runtime, while a lower-star review expected longer life.
+
+### Dissatisfaction signals observed
+
+- One one-star review described slow performance, freezes, software/browser incompatibility, and difficulty signing in as administrator.
+- Other low-rating comments described a camera access issue and a failed screen with a warranty concern.
+- One three-star review liked the value but expected better battery life.
 
 ### Recommendations
 
-1. Validate the leading positive and negative themes by manually coding a stratified sample of reviews across ratings and dates.
-2. For the largest verified negative theme, inspect product variant, review date, and support/return records before proposing a fix.
-3. Preserve highly rated attributes by tracking theme frequency and rating after product changes.
-4. Run controlled interventions and monitor rating, return, and support-contact changes; do not infer causality from text alone.
-5. Re-run the same product and sort scope periodically, recording collection date and page limits to make comparisons reproducible.
+1. Review compatibility guidance and setup instructions for browser requirements, administrator access, and account configuration before purchase.
+2. Check camera permission troubleshooting guidance and support resolution outcomes before attributing the issue to hardware.
+3. Review screen-failure and warranty cases for recurring patterns by model/production date; do not infer a defect rate from one review.
+4. Compare battery expectations in product claims with tests under common school/browsing workloads.
+5. Manually code all low-star reviews and a stratified sample of other ratings, then compare human labels with VADER and the rating override.
+6. Repeat collection at documented intervals and compare themes with returns, service, and support-contact data before prioritizing investment.
 
-## Reproducibility and limitations
+## Scraping constraints and safe-stop behavior
 
-The app includes a minimum-50-review warning. The scraper does not guarantee Best Buy currently has 50 reviews for a chosen product, does not bypass hidden or inaccessible reviews, and is not guaranteed to parse future layouts. There are no sample records passed off as genuine data. The final CSV/Excel files are generated by the app from uploaded or authorized collected data.
+- Use only a direct Best Buy Canada product URL; the project rejects search URLs and checks robots.txt before its Selenium collection run.
+- Check current terms and the applicable authorization for the intended collection and redistribution. A public product page alone does not establish permission. The terms could not be confirmed during this work.
+- Respect visible consent choices. The collector only uses a visible site-provided Reject All control; if the choice is unavailable or the control remains blocked, stop.
+- Do not rotate proxies, bypass CAPTCHA, use private endpoints, log in, reuse cookies, defeat rate limits, or automate around access-denied pages.
+- Use bounded page counts and pauses. Stop on 403/429, CAPTCHA, access denial, sign-in/OTP redirect, changed markup, or a blocked control. Do not treat retries as a way around a block.
+- The browser later redirected to an OTP sign-in page after sort interactions. No sign-in, one-time code, session cookie, or workaround was attempted.
+- The Selenium collector's live end-to-end success remains unverified. The 50 records in this report were captured via the visible public UI and processed locally.
+- Reviewer names are personal data. Keep exports access-controlled, share only when permitted, and consider anonymizing reviewer names in recruiter-facing copies.
+
+## Deliverables and limitations
+
+- Local review-level CSV: `outputs/asus_cm14_bestbuy_reviews_sentiment.csv`
+- Local Excel workbook: `outputs/asus_cm14_bestbuy_reviews_sentiment.xlsx` (Reviews, Insights, Recommendations, Collection sheets)
+- Python analysis application, visible-page Selenium collector, notebook, and tests are in the project.
+- This is a 50-card sample, not a complete export of 434 reviews. One title was unavailable in the source card. Current terms/authorization, reuse/redistribution permission, and deployment of the latest local changes remain to be verified.
