@@ -71,4 +71,4 @@ This rule is a transparent heuristic, not a trained product-specific model. A hu
 - Local Excel workbook: `outputs/asus_cm14_bestbuy_reviews_sentiment.xlsx` (Reviews, Insights, Recommendations, Collection sheets)
 - Python analysis application, visible-page Selenium collector, notebook, and tests are in the project.
 - This is a 50-card sample, not a complete export of 434 reviews. One title was unavailable in the source card, and review text indicates possible cross-model aggregation. Current terms and any required reuse/redistribution authorization are the operator's responsibility.
-- The requirement matrix gives the project a recruiter-style evidence score of 79/100, with deductions for field/model fit, lack of a live packaged-Selenium run, and the heuristic sentiment method.
+- The requirement matrix gives the project a recruiter-style evidence score of 80/100, with deductions for field/model fit, lack of a live packaged-Selenium run, and the heuristic sentiment method.

@@ -2,7 +2,7 @@
 
 **Checked:** 2026-10-26
 **Live sample product:** ASUS CM14 14-inch Chromebook
-**Recruiter-style evaluation:** 79/100, evidence-based and provisional
+**Recruiter-style evaluation:** 80/100, evidence-based and provisional
 
 This report separates verified application behavior from external/source-data qualifications. The sample below came from visible Best Buy Canada review cards; it is not synthetic and does not represent every review for the product.
 
@@ -17,7 +17,7 @@ This report separates verified application behavior from external/source-data qu
 | Genuine CSV and Excel deliverables | Generated locally | `outputs/asus_cm14_bestbuy_reviews_sentiment.csv` and `.xlsx` contain the 50-row sample, sentiment results, insights, recommendations, and provenance. The files are git-ignored to avoid publishing reviewer names. |
 | Product-specific insights and recommendations | Exploratory listing-level findings; not validated as CM14-specific | The listing average was 4.59/5 on 434 reviews. The 50-card sample mean is 4.50/5: 37 five-star, 7 four-star, 3 three-star, and 3 one-star. Eight sampled review texts mention CX14, seven mention Intel Celeron, six mention 64GB, only one mentions CM14, and none mention MediaTek, Kompanio, or 128GB. This mismatch prevents confidently attributing themes to the CM14 hardware. |
 | Scraping constraints and stakeholder report | Implemented and updated | The report documents visible-control collection, stop conditions, privacy, and non-evasion guidance. Current terms/authorization must still be checked by the user before reuse or redistribution. |
-| Deployment | Deployed and smoke-checked | After the source push, the hosted app loaded with the ASUS default URL and sidebar collector controls visible. GitHub Actions passed for the published revisions. |
+| Deployment | Deployed and smoke-checked | Commit `e527bcb` is published to `main`; GitHub Actions run #10 passed. The hosted app analyzed a synthetic-only 50-row upload, then clearing the upload removed the old metrics and returned the app to its empty state. |
 
 ## Data validation
 
@@ -44,7 +44,7 @@ These boundaries do not indicate a failing unit test or broken application path.
 | Data acquisition and field quality | 12/20 | 50 genuine visible records and pagination/sort controls were verified, but one title is unavailable, stable source IDs are absent, and review text contains cross-model references. |
 | Sentiment analysis and business value | 14/20 | Sample metrics and recommendations are reproducible; VADER is heuristic and the listing-to-review model fit prevents strong product-specific conclusions. |
 | Documentation and stakeholder communication | 18/20 | Notebook, requirement matrix, provenance, limitations, and recommendations are documented; current terms/authorization remain an operator/site decision. |
-| Testing, reliability, and deployment | 17/20 | 22 tests, warning-strict dashboard integration test, notebook workflow execution, CI, and hosted app smoke check passed; packaged Selenium live collection was not run. |
-| **Total** | **79/100** | **Strong working project with material evidence limits; not a fully validated, product-specific assessment yet.** |
+| Testing, reliability, and deployment | 18/20 | 23 tests passed with warnings treated as errors; notebook workflow execution, CI, and hosted upload/removal smoke checks passed. The packaged Selenium live collection was not run. |
+| **Total** | **80/100** | **Strong working project with material evidence limits; not a fully validated, product-specific assessment yet.** |
 
 The score rates demonstrated work, not the absence of external constraints. It should not be represented as a flawless or fully exhaustive scrape.

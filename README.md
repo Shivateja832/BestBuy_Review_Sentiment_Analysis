@@ -9,7 +9,7 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 - Data-quality flags: one review card had no visible title; it remains blank. The page exposed no review IDs, so deterministic SHA-256 keys are used. Review text includes references to CX14/Intel Celeron/64GB hardware, while the selected listing is CM14/MediaTek/128GB; treat findings as listing-level until this fit is resolved.
 - Site compliance: collection used visible sort and Show More controls only, with no private API, login, proxy rotation, CAPTCHA bypass, or access-control evasion. Verify current terms and authorization before reuse or redistribution.
 - Repository: source uploaded to `Shivateja832/BestBuy_Review_Sentiment_Analysis` on `main`.
-- Streamlit Community Cloud: the post-push app loaded successfully; the ASUS default URL and sidebar collector controls were visible.
+- Streamlit Community Cloud: the hosted app loaded successfully. A synthetic-only 50-row upload rendered analysis and downloads; removing it cleared the prior analysis and restored the empty state.
 
 App URL: <https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/>
 
