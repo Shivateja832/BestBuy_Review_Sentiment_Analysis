@@ -16,7 +16,7 @@ This report separates completed local deliverables from limitations that cannot 
 | Genuine CSV and Excel deliverables | Generated locally | `outputs/asus_cm14_bestbuy_reviews_sentiment.csv` and `.xlsx` contain the 50-row sample, sentiment results, insights, recommendations, and provenance. The files are git-ignored to avoid publishing reviewer names. |
 | Product-specific insights and recommendations | Completed as exploratory sample findings | The sample mean rating is 4.50/5: 37 five-star, 7 four-star, 3 three-star, and 3 one-star reviews. The report summarizes observed themes and cautions against generalizing from this non-random sample. |
 | Scraping constraints and stakeholder report | Implemented and updated | The report documents visible-control collection, stop conditions, privacy, and non-evasion guidance. Current terms/authorization must still be checked by the user before reuse or redistribution. |
-| Deployment | Hosted app exists; latest source revision needs live redeployment verification | The URL is in the README. Verify the deployed app after the source update before relying on the new sentiment correction or default product. |
+| Deployment | Deployed and smoke-checked | After the source push, the hosted app loaded with the ASUS default URL and sidebar collector controls visible. GitHub Actions passed for the published revisions. |
 
 ## Data validation
 
@@ -29,8 +29,7 @@ This report separates completed local deliverables from limitations that cannot 
 ## Remaining verification
 
 1. Confirm the current Best Buy terms and authorized use/redistribution conditions. Storefront access by itself does not establish permission for downstream use.
-2. Confirm Streamlit Cloud has redeployed the latest source and verify the changed default product and sentiment labels on the hosted app.
-3. If the assignment requires proving that the packaged Selenium collector itself can complete a live run, that end-to-end run still needs verification. The current 50-row sample was obtained through visible browser controls and processed locally.
-4. The site's later redirect to a one-time-passcode sign-in page was not pursued; no credentials, cookies, or access-control workarounds were used.
+2. If the assignment requires proving that the packaged Selenium collector itself can complete a live run, that end-to-end run still needs verification. The current 50-row sample was obtained through visible browser controls and processed locally.
+3. The site's later redirect to a one-time-passcode sign-in page was not pursued; no credentials, cookies, or access-control workarounds were used.
 
 These limitations are disclosed rather than hidden. The generated sample and project tests do not establish permission, exhaustive coverage, or correctness of every automated sentiment label.

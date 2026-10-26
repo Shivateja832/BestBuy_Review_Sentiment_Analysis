@@ -9,7 +9,7 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 - Data limitation: one review card had no visible title; it remains blank. The page exposed no review IDs, so deterministic SHA-256 keys are used.
 - Site compliance: collection used visible sort and Show More controls only, with no private API, login, proxy rotation, CAPTCHA bypass, or access-control evasion. Verify current terms and authorization before reuse or redistribution.
 - Repository: source uploaded to `Shivateja832/BestBuy_Review_Sentiment_Analysis` on `main`.
-- Streamlit Community Cloud: app created from `main` / `app.py`; the latest source revision requires a post-push redeployment check.
+- Streamlit Community Cloud: the post-push app loaded successfully; the ASUS default URL and sidebar collector controls were visible.
 
 App URL: <https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/>
 
