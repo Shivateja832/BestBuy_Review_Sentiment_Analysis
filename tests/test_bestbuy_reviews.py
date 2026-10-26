@@ -1,5 +1,6 @@
 from src.bestbuy_reviews import (
     _click_show_more,
+    _additional_reviews_loaded,
     _reject_optional_cookies,
     _raise_if_access_denied,
     _review_page_url,
@@ -222,6 +223,80 @@ def test_show_more_reports_when_interceptor_is_not_consent_overlay():
         assert "not visible" in str(exc)
     else:
         raise AssertionError("A non-consent page overlay must be reported explicitly.")
+
+
+def test_visible_review_snapshot_requeries_after_stale_dom_element():
+    from selenium.common.exceptions import StaleElementReferenceException
+
+    class Card:
+        def __init__(self, markup, stale=False):
+            self.markup = markup
+            self.stale = stale
+
+        def is_displayed(self):
+            return True
+
+        def get_attribute(self, name):
+            assert name == "outerHTML"
+            if self.stale:
+                raise StaleElementReferenceException("DOM updated")
+            return self.markup
+
+    class Driver:
+        calls = 0
+
+        def find_elements(self, by, selector):
+            self.calls += 1
+            if self.calls == 1:
+                return [Card("<article>old</article>", stale=True)]
+            return [Card("<article>new</article>")]
+
+    driver = Driver()
+    assert _visible_review_html(driver, ".review-card") == "<article>new</article>"
+    assert driver.calls == 2
+
+
+def test_additional_reviews_wait_ignores_transient_stale_snapshot():
+    from selenium.common.exceptions import StaleElementReferenceException
+
+    class Card:
+        def is_displayed(self):
+            return True
+
+        def get_attribute(self, name):
+            raise StaleElementReferenceException("DOM update in progress")
+
+    class Driver:
+        def find_elements(self, by, selector):
+            return [Card()]
+
+    assert not _additional_reviews_loaded(
+        Driver(),
+        ".review-card",
+        "<article>previous snapshot</article>",
+    )
+
+
+def test_show_more_stale_click_waits_for_visible_content_change():
+    from selenium.common.exceptions import StaleElementReferenceException
+
+    class ShowMore:
+        text = "Show More"
+
+        def is_displayed(self):
+            return True
+
+        def click(self):
+            raise StaleElementReferenceException("button replaced after activation")
+
+    class Driver:
+        def find_elements(self, by, selector):
+            return [ShowMore()]
+
+        def execute_script(self, script, element):
+            return None
+
+    assert _click_show_more(Driver()) is True
 
 
 def test_parse_review_cards_extracts_required_public_fields():

@@ -62,7 +62,7 @@ This rule is a transparent heuristic, not a trained product-specific model. A hu
 - Do not rotate proxies, bypass CAPTCHA, use private endpoints, log in, reuse cookies, defeat rate limits, or automate around access-denied pages.
 - Use bounded page counts and pauses. Stop on 403/429, CAPTCHA, access denial, sign-in/OTP redirect, changed markup, or a blocked control. Do not treat retries as a way around a block.
 - The browser later redirected to an OTP sign-in page after sort interactions. No sign-in, one-time code, session cookie, or workaround was attempted.
-- The Selenium collector's live end-to-end success is not claimed. The 50 records in this report were captured via the visible public UI and processed locally.
+- The packaged Selenium collector was run against the selected public page. It reached the review page, but Show More was intercepted by a OneTrust consent overlay with no visible Reject All control; it stopped without bypassing the overlay. The 50 records in this report were captured via visible browser interactions and processed locally, not by that collector run.
 - Reviewer names are personal data. Keep exports access-controlled, share only when permitted, and consider anonymizing reviewer names in recruiter-facing copies.
 
 ## Deliverables and limitations

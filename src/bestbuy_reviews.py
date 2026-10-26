@@ -15,7 +15,11 @@ from urllib.robotparser import RobotFileParser
 import pandas as pd
 from bs4 import BeautifulSoup, Tag
 from selenium import webdriver
-from selenium.common.exceptions import ElementClickInterceptedException, TimeoutException
+from selenium.common.exceptions import (
+    ElementClickInterceptedException,
+    StaleElementReferenceException,
+    TimeoutException,
+)
 from selenium.webdriver import ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as conditions
@@ -170,12 +174,19 @@ def _rating_value(card: Tag) -> float | None:
 
 def _visible_review_html(driver: webdriver.Chrome, selector: str) -> str:
     """Serialize only review cards Selenium reports as visible in the browser."""
-    visible_cards = (
-        element.get_attribute("outerHTML")
-        for element in driver.find_elements(By.CSS_SELECTOR, selector)
-        if element.is_displayed()
-    )
-    return "\n".join(markup for markup in visible_cards if markup)
+    for attempt in range(2):
+        try:
+            visible_cards = (
+                element.get_attribute("outerHTML")
+                for element in driver.find_elements(By.CSS_SELECTOR, selector)
+                if element.is_displayed()
+            )
+            return "\n".join(markup for markup in visible_cards if markup)
+        except StaleElementReferenceException:
+            if attempt == 1:
+                raise
+            time.sleep(0.1)
+    return ""
 
 
 def parse_review_cards(
@@ -342,6 +353,8 @@ def _click_show_more(
                     "Show More remains blocked after the visible Reject All control was used. "
                     "Collection stopped without bypassing the page."
                 ) from exc
+            except StaleElementReferenceException:
+                return True
             return True
     return False
 
@@ -432,6 +445,19 @@ def _chromium_binary() -> str | None:
     return None
 
 
+def _additional_reviews_loaded(
+    driver: webdriver.Chrome,
+    selector: str,
+    previous_html: str,
+) -> bool:
+    """Wait for a stable, non-empty visible review-card snapshot to change."""
+    try:
+        current_html = _visible_review_html(driver, selector)
+    except StaleElementReferenceException:
+        return False
+    return bool(current_html) and current_html != previous_html
+
+
 def _review_page_url(product_url: str) -> str:
     """Resolve the public review page linked from a product page."""
     parsed = urlparse(product_url)
@@ -519,10 +545,11 @@ def scrape_reviews(
                     break
                 try:
                     WebDriverWait(driver, settings.page_load_timeout).until(
-                        lambda browser: _visible_review_html(
-                            browser, settings.review_card_selector
+                        lambda browser: _additional_reviews_loaded(
+                            browser,
+                            settings.review_card_selector,
+                            html,
                         )
-                        != html
                     )
                 except TimeoutException as exc:
                     _raise_if_access_denied(driver)
