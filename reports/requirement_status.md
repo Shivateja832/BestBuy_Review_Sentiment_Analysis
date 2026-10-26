@@ -18,7 +18,7 @@ This report separates verified application behavior from external/source-data qu
 | Genuine CSV and Excel deliverables | Met | `outputs/asus_cm14_bestbuy_reviews_sentiment.csv` and `.xlsx` contain the 50-row sample, sentiment results, insights, recommendations, and provenance. The files are git-ignored to avoid publishing reviewer names. |
 | Product-specific insights and recommendations | Not met for CM14-specific claims | The listing average was 4.59/5 on 434 reviews. The 50-card sample mean is 4.50/5: 37 five-star, 7 four-star, 3 three-star, and 3 one-star. Eight sampled review texts mention CX14, seven mention Intel Celeron, six mention 64GB, only one mentions CM14, and none mention MediaTek, Kompanio, or 128GB. This mismatch prevents confidently attributing themes to the CM14 hardware; the report labels them exploratory listing-level signals. |
 | Scraping constraints and stakeholder report | Met for documentation | The report documents visible-control collection, stop conditions, privacy, and non-evasion guidance. Current terms/authorization must still be checked by the user before reuse or redistribution. |
-| Deployment and tested upload workflow | Met | The published `main` branch passed CI. The hosted app analyzed a synthetic-only 50-row upload, then clearing the upload removed the old metrics and returned the app to its empty state. |
+| Deployment and tested upload workflow | Met | Commit `bb5c3a8` is published to `main`; GitHub Actions run #13 passed. The hosted app analyzed a synthetic-only 50-row CSV with a generated-title provenance notice and download controls; removing the file cleared the analysis and restored the empty state. |
 
 ## Data validation
 
