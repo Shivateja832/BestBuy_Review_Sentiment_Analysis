@@ -67,16 +67,29 @@ with st.sidebar:
         "is available. No CAPTCHA bypass, proxy rotation, login, private API, or access-control "
         "evasion; collection stops if a consent choice is unavailable or access is blocked."
     )
-    scrape_button = st.button("Collect public reviews", type="primary", use_container_width=True)
+    if uploaded is not None:
+        st.caption("Remove the uploaded CSV before starting a public-page collection.")
+    scrape_button = st.button(
+        "Collect public reviews",
+        type="primary",
+        use_container_width=True,
+        disabled=uploaded is not None,
+    )
 
 if "reviews" not in st.session_state:
     st.session_state.reviews = pd.DataFrame(columns=REVIEW_COLUMNS)
+if "uploaded_file_name" not in st.session_state:
+    st.session_state.uploaded_file_name = None
 if uploaded is not None:
+    st.session_state.uploaded_file_name = uploaded.name
     try:
         st.session_state.reviews = load_review_csv(uploaded)
     except ValueError as exc:
         st.session_state.reviews = pd.DataFrame(columns=REVIEW_COLUMNS)
         st.error(f"Could not read the selected CSV: {exc}")
+elif st.session_state.uploaded_file_name is not None:
+    st.session_state.reviews = pd.DataFrame(columns=REVIEW_COLUMNS)
+    st.session_state.uploaded_file_name = None
 
 if scrape_button:
     if not product_url.strip():

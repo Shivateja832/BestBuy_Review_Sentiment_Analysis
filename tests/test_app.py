@@ -41,3 +41,20 @@ def test_dashboard_analyzes_reviews_and_renders_exports_with_dataset_note():
     assert any("Treat as a test sample." in warning.value for warning in app.warning)
     assert len(app.get("download_button")) == 2
     assert any("meets the minimum 50-review threshold" in item.value for item in app.success)
+
+
+def test_removing_uploaded_csv_clears_its_previous_analysis():
+    app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py")).run(
+        timeout=30
+    )
+    app.session_state["reviews"] = pd.DataFrame(
+        [{"review_text": "Previously uploaded review"}],
+        columns=["review_text"],
+    )
+    app.session_state["uploaded_file_name"] = "reviews.csv"
+    app.run(timeout=30)
+
+    assert not app.exception
+    assert app.session_state["reviews"].empty
+    assert app.session_state["uploaded_file_name"] is None
+    assert any("Upload a review CSV" in message.value for message in app.info)
