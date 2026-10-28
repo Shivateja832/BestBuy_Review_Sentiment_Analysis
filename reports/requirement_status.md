@@ -60,4 +60,4 @@ One of the 172 reviews displayed by the listing was not available among the visi
 
 ## Deployment status
 
-The Dell update was pushed to GitHub `main` as commit `204186c5267b1e0ffe53d02a1ae22d401c236c17`. GitHub Actions run 18 passed, the Streamlit dashboard rendered after the push, and the hosted endpoint returned HTTP 200 on 2026-10-28. This confirms source deployment and dashboard startup; it does not change the separate Best Buy Selenium HTTP 403 limitation.
+The app code was pushed to GitHub `main` as commit `204186c5267b1e0ffe53d02a1ae22d401c236c17`; the 171-review deliverable documentation/notebook update was pushed as `3214cb1df000b906c2849736e3ba7b34fb4cc6d8`. GitHub Actions run 20 passed, the Streamlit dashboard rendered after deployment, and the hosted endpoint returned HTTP 200 on 2026-10-28. This confirms source deployment and dashboard startup; it does not change the separate standalone Selenium HTTP 403 limitation.

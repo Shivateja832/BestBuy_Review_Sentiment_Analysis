@@ -11,7 +11,7 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 - Site compliance: the sample was collected using visible Best Buy page controls only, without private APIs, login, proxy rotation, CAPTCHA bypass, or access-control evasion. Check current terms and any authorization needed for reuse or redistribution.
 - Local smoke test: the current local Streamlit app returned HTTP 200.
 - Tests: the full suite passed 30/30 in the deployment clone after the pagination changes. The live sample was collected through the shared browser's visible controls; a separate Selenium session returned HTTP 403.
-- Deployment: commit `204186c` was pushed to GitHub `main`; GitHub Actions passed, and the hosted Streamlit dashboard rendered after the push. The hosted app returned HTTP 200. This confirms the app deployment, not live Best Buy access from its Selenium runtime.
+- Deployment: app code was pushed in commit `204186c`, and the 171-review deliverable documentation in `3214cb1`. GitHub Actions run 20 passed, and the hosted Streamlit dashboard returned HTTP 200. This confirms deployment, not live access from a fresh standalone Selenium session.
 - AI disclosure: AI assistance was used during development and documentation. At runtime, sentiment classification uses the VADER lexicon-based method; the app does not call a generative AI model.
 
 App URL: <https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/>
