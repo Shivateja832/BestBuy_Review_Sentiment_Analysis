@@ -8,7 +8,7 @@ This table evaluates the assignment requirements as written. Additional quality 
 
 ## Recruiter-style evaluation
 
-**Evidence-based estimate: 88/100; provisional, not a guaranteed recruiter score.**
+**Evidence-based estimate: 90/100; provisional, not a guaranteed recruiter score.**
 
 | Area | Score | Evidence and remaining qualification |
 |---|---:|---|
@@ -16,7 +16,7 @@ This table evaluates the assignment requirements as written. Additional quality 
 | Review sample and required fields | 19/20 | 50 visible reviews have all required fields and unique generated keys. The retailer did not expose a review ID; the sample is not the full 172-review population. |
 | Sentiment analysis and business findings | 17/20 | Sentiment labels and exploratory recommendations are provided. Human-labeled accuracy validation was not performed; it is a quality improvement, not an explicit assignment requirement. |
 | Deliverables and documentation | 19/20 | Notebook, CSV, workbook, and stakeholder/requirements documentation are present locally. Best Buy's current reuse/redistribution terms have not been independently confirmed. |
-| Testing, reliability, and deployment | 15/20 | The full suite passed 30/30 in the deployment clone and the staged app returned HTTP 200. The hosted version is still older at this point; live Selenium collection remains blocked by HTTP 403. |
+| Testing, reliability, and deployment | 17/20 | The full suite passed 30/30; GitHub Actions passed after commit `204186c`; the hosted dashboard rendered and returned HTTP 200. The packaged Selenium collector remains blocked by Best Buy HTTP 403. |
 
 | Assignment requirement | Status | Evidence |
 |---|---|---|
@@ -60,4 +60,4 @@ The sample is not exhaustive and insights should not be generalized to all 172 r
 
 ## Deployment status
 
-The local Dell version is not yet deployed. The hosted Streamlit URL returned HTTP 200 on 2026-10-28, but the repository's `main` branch still contains the older ASUS requirement report. This workspace is not a Git repository and GitHub CLI authentication is unavailable here, so the local updates could not be pushed or redeployed from this environment.
+The Dell update was pushed to GitHub `main` as commit `204186c5267b1e0ffe53d02a1ae22d401c236c17`. GitHub Actions run 18 passed, the Streamlit dashboard rendered after the push, and the hosted endpoint returned HTTP 200 on 2026-10-28. This confirms source deployment and dashboard startup; it does not change the separate Best Buy Selenium HTTP 403 limitation.
