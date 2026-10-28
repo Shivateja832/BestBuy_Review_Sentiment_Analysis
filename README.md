@@ -5,12 +5,12 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 ## Status
 
 - Application: implemented and locally testable.
-- Genuine review sample: 50 visible reviews collected from a Best Buy Canada Dell laptop listing on 2026-10-28 and analyzed locally.
-- Data quality: all 50 records have source-provided titles and non-empty assignment fields. The page did not expose a stable review ID, so deterministic SHA-256 primary keys are used.
+- Genuine review sample: 171 unique visible reviews collected from a Best Buy Canada Dell laptop listing on 2026-10-28 and analyzed locally.
+- Data quality: all 171 records have source-provided titles and non-empty assignment fields. The page did not expose a stable review ID, so deterministic SHA-256 primary keys are used.
 - Live page verification: the listing displayed 172 reviews. Through the ordinary visible page controls, all five requested sort views were selected and Show More loaded 171 visible cards in each view until the control disappeared. This verifies the site UI, not the packaged Selenium run.
 - Site compliance: the sample was collected using visible Best Buy page controls only, without private APIs, login, proxy rotation, CAPTCHA bypass, or access-control evasion. Check current terms and any authorization needed for reuse or redistribution.
 - Local smoke test: the current local Streamlit app returned HTTP 200.
-- Tests: the full suite passed 30/30 in the deployment clone after the pagination changes. This does not verify live access by the packaged Selenium collector.
+- Tests: the full suite passed 30/30 in the deployment clone after the pagination changes. The live sample was collected through the shared browser's visible controls; a separate Selenium session returned HTTP 403.
 - Deployment: commit `204186c` was pushed to GitHub `main`; GitHub Actions passed, and the hosted Streamlit dashboard rendered after the push. The hosted app returned HTTP 200. This confirms the app deployment, not live Best Buy access from its Selenium runtime.
 - AI disclosure: AI assistance was used during development and documentation. At runtime, sentiment classification uses the VADER lexicon-based method; the app does not call a generative AI model.
 
@@ -18,9 +18,9 @@ App URL: <https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.stre
 
 See [`reports/requirement_status.md`](./reports/requirement_status.md) for a requirement-by-requirement completion matrix and [`reports/stakeholder_report.md`](./reports/stakeholder_report.md) for the sample analysis.
 
-The [Dell 15.6-inch laptop review page](https://www.bestbuy.ca/en-ca/product/dell-15-6-120hz-laptop-amd-ryzen-7-7730u-16gb-ddr4-512gb-ssd-windows-11-home-carbon-black/19821568/review) displayed 172 reviews when checked. The visible page exposed all five requested sort choices; each sort was paginated through 171 visible cards until Show More disappeared. The deliverable sample remains 50 reviews from Most Helpful; the listing's displayed total and visible card count differ by one, so do not claim a 172-record export.
+The [Dell 15.6-inch laptop review page](https://www.bestbuy.ca/en-ca/product/dell-15-6-120hz-laptop-amd-ryzen-7-7730u-16gb-ddr4-512gb-ssd-windows-11-home-carbon-black/19821568/review) displayed 172 reviews when checked. All five visible sort choices were selected; each view paginated through 171 visible cards before Show More disappeared. The export contains those 171 unique visible cards after deduplication. The page header and visible-card count differ by one, so this is not described as a 172-record export.
 
-The generated CSV and Excel files are in `outputs/` on this workstation and are git-ignored to avoid publishing reviewer names or full review text. The workbook includes review results, insights, recommendations, and collection provenance. The sample mean rating is 4.42/5 (33 five-star, 8 four-star, 7 three-star, 1 two-star, and 1 one-star review). The former ASUS CM14 page returned 403 in an earlier session; it is not the product used for the current sample.
+The generated CSV and Excel files are in `outputs/` on this workstation and are git-ignored to avoid publishing reviewer names or full review text. The workbook includes review results, insights, recommendations, and collection provenance. The 171 accessible reviews average 4.55/5 (121 five-star, 31 four-star, 14 three-star, 2 two-star, and 3 one-star reviews). A fresh standalone Selenium session returned HTTP 403; the sample was obtained through normal visible browser controls without evading that block.
 
 ## Quick start (Windows PowerShell)
 
@@ -79,5 +79,5 @@ The current source was pushed to GitHub `main` at commit `204186c` and passed Gi
 - `packages.txt` — Chromium packages requested for Community Cloud.
 - `reports/stakeholder_report.md` — methods, risks, limitations, and recommendations.
 - `tests/` — focused tests for scraping parsing and sentiment labels.
-- `outputs/dell_15_6_laptop_bestbuy_reviews_sentiment.csv` and `.xlsx` — 50-record public-page sample and analysis, stored locally and git-ignored.
+- `outputs/dell_15_6_laptop_bestbuy_reviews_sentiment.csv` and `.xlsx` — 171-record deduplicated visible-page export and analysis, stored locally and git-ignored.
 - `outputs/review_template.csv` — field-header template.
