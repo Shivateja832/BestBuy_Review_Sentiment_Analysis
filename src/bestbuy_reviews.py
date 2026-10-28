@@ -359,6 +359,32 @@ def _click_show_more(
     return False
 
 
+def _show_more_is_visible(driver: webdriver.Chrome) -> bool:
+    candidates = driver.find_elements(
+        By.XPATH,
+        "//*[self::button or self::a or @role='button']",
+    )
+    return any(
+        element.is_displayed()
+        and "show more" in element.text.strip().casefold()
+        for element in candidates
+    )
+
+
+def _raise_if_pagination_truncated(
+    driver: webdriver.Chrome,
+    *,
+    sort_label: str,
+    max_pages: int,
+) -> None:
+    if _show_more_is_visible(driver):
+        raise RuntimeError(
+            f"Pagination reached the configured limit of {max_pages} visible pages for "
+            f"'{sort_label}', but Best Buy still shows a visible Show More control. Increase "
+            "the limit or run again to avoid reporting an incomplete collection."
+        )
+
+
 def _visible_consent_overlay(driver: webdriver.Chrome) -> bool:
     overlays = driver.find_elements(By.CSS_SELECTOR, CONSENT_OVERLAY_SELECTOR)
     return any(overlay.is_displayed() for overlay in overlays)
@@ -540,6 +566,11 @@ def scrape_reviews(
                 ):
                     collected.setdefault(str(review["primary_key"]), review)
                 if page_number + 1 >= settings.max_pages_per_sort:
+                    _raise_if_pagination_truncated(
+                        driver,
+                        sort_label=sort_label,
+                        max_pages=settings.max_pages_per_sort,
+                    )
                     break
                 if not _click_show_more(driver):
                     break

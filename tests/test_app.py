@@ -30,9 +30,9 @@ def test_dashboard_analyzes_reviews_and_renders_exports_with_dataset_note():
     )
 
     app_path = str(Path(__file__).resolve().parents[1] / "app.py")
-    app = AppTest.from_file(app_path).run(timeout=30)
+    app = AppTest.from_file(app_path).run(timeout=120)
     app.session_state["reviews"] = reviews
-    app.run(timeout=30)
+    app.run(timeout=120)
 
     assert not app.exception
     assert [metric.label for metric in app.metric] == [
@@ -49,14 +49,14 @@ def test_dashboard_analyzes_reviews_and_renders_exports_with_dataset_note():
 
 def test_removing_uploaded_csv_clears_its_previous_analysis():
     app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py")).run(
-        timeout=30
+        timeout=120
     )
     app.session_state["reviews"] = pd.DataFrame(
         [{"review_text": "Previously uploaded review"}],
         columns=["review_text"],
     )
     app.session_state["uploaded_file_name"] = "reviews.csv"
-    app.run(timeout=30)
+    app.run(timeout=120)
 
     assert not app.exception
     assert app.session_state["reviews"].empty

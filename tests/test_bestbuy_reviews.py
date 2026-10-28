@@ -225,6 +225,65 @@ def test_show_more_reports_when_interceptor_is_not_consent_overlay():
         raise AssertionError("A non-consent page overlay must be reported explicitly.")
 
 
+def test_show_more_visibility_detects_a_remaining_visible_page():
+    from src.bestbuy_reviews import _show_more_is_visible
+
+    class Button:
+        text = "Show More"
+
+        def is_displayed(self):
+            return True
+
+    class Driver:
+        def find_elements(self, by, selector):
+            assert by == "xpath"
+            return [Button()]
+
+    assert _show_more_is_visible(Driver())
+
+
+def test_show_more_visibility_ignores_hidden_pagination_control():
+    from src.bestbuy_reviews import _show_more_is_visible
+
+    class Button:
+        text = "Show More"
+
+        def is_displayed(self):
+            return False
+
+    class Driver:
+        def find_elements(self, by, selector):
+            return [Button()]
+
+    assert not _show_more_is_visible(Driver())
+
+
+def test_pagination_limit_with_more_reviews_is_an_explicit_failure():
+    from src.bestbuy_reviews import _raise_if_pagination_truncated
+
+    class Button:
+        text = "Show More"
+
+        def is_displayed(self):
+            return True
+
+    class Driver:
+        def find_elements(self, by, selector):
+            return [Button()]
+
+    try:
+        _raise_if_pagination_truncated(
+            Driver(),
+            sort_label="Newest",
+            max_pages=1,
+        )
+    except RuntimeError as exc:
+        assert "Newest" in str(exc)
+        assert "incomplete collection" in str(exc)
+    else:
+        raise AssertionError("A capped, incomplete scrape must not report success.")
+
+
 def test_visible_review_snapshot_requeries_after_stale_dom_element():
     from selenium.common.exceptions import StaleElementReferenceException
 

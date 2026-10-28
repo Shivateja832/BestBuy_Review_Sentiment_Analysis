@@ -5,19 +5,22 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 ## Status
 
 - Application: implemented and locally testable.
-- Genuine review sample: 50 visible ASUS CM14 reviews collected on 2026-10-26 and analyzed locally.
-- Data quality: the source exposed no review ID, so deterministic SHA-256 keys are used. One review card lacked a title; its display title is transparently derived from its text, and `title_source` marks that row as generated. Review text includes references to CX14/Intel Celeron/64GB hardware, while the selected listing is CM14/MediaTek/128GB; do not treat findings as verified CM14-specific evidence.
-- Site compliance: collection used visible sort and Show More controls only, with no private API, login, proxy rotation, CAPTCHA bypass, or access-control evasion. Verify current terms and authorization before reuse or redistribution.
-- Repository: source uploaded to `Shivateja832/BestBuy_Review_Sentiment_Analysis` on `main`.
-- Streamlit Community Cloud: the hosted app loaded successfully after commit `e7360ca`. A synthetic-only 50-row upload rendered analysis and downloads; removing it cleared the prior analysis and restored the empty state.
+- Genuine review sample: 50 visible reviews collected from a Best Buy Canada Dell laptop listing on 2026-10-28 and analyzed locally.
+- Data quality: all 50 records have source-provided titles and non-empty assignment fields. The page did not expose a stable review ID, so deterministic SHA-256 primary keys are used.
+- Live page verification: the listing displayed 172 reviews. Through the ordinary visible page controls, all five requested sort views were selected and Show More loaded 171 visible cards in each view until the control disappeared. This verifies the site UI, not the packaged Selenium run.
+- Site compliance: the sample was collected using visible Best Buy page controls only, without private APIs, login, proxy rotation, CAPTCHA bypass, or access-control evasion. Check current terms and any authorization needed for reuse or redistribution.
+- Local smoke test: the current local Streamlit app returned HTTP 200.
+- Tests: the full suite passed 30/30 in the deployment clone after the pagination changes. This does not verify live access by the packaged Selenium collector.
+- Deployment: the hosted URL returns HTTP 200, but GitHub `main` still has the older ASUS requirement report. The current Dell changes are local and have not been redeployed.
+- AI disclosure: AI assistance was used during development and documentation. At runtime, sentiment classification uses the VADER lexicon-based method; the app does not call a generative AI model.
 
 App URL: <https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/>
 
 See [`reports/requirement_status.md`](./reports/requirement_status.md) for a requirement-by-requirement completion matrix and [`reports/stakeholder_report.md`](./reports/stakeholder_report.md) for the sample analysis.
 
-The [ASUS CM14 Chromebook review page](https://www.bestbuy.ca/en-ca/product/asus-cm14-14-chromebook-mediatek-kompanio-540-4gb-lpddr5x-128gb-emmc-chromeos-pure-grey/19826852/review) displayed 434 reviews when selected. The sample contains 50 distinct visible cards in the Most Relevant view, loaded in observed increments of 10 with the visible Show More control. All five requested sort labels were selected and confirmed on the live page. The sample is not an export of all 434 reviews.
+The [Dell 15.6-inch laptop review page](https://www.bestbuy.ca/en-ca/product/dell-15-6-120hz-laptop-amd-ryzen-7-7730u-16gb-ddr4-512gb-ssd-windows-11-home-carbon-black/19821568/review) displayed 172 reviews when checked. The visible page exposed all five requested sort choices; each sort was paginated through 171 visible cards until Show More disappeared. The deliverable sample remains 50 reviews from Most Helpful; the listing's displayed total and visible card count differ by one, so do not claim a 172-record export.
 
-The generated CSV and Excel files are in `outputs/` on this workstation and are git-ignored to avoid publishing reviewer names or full review text. The workbook includes review results, insights, recommendations, and collection provenance. The sample mean rating is 4.50/5 (37 five-star, 7 four-star, 3 three-star, and 3 one-star reviews). The Best Buy search for a product matching the CX14 review text returned 403 during this verification, so no replacement product or review count was inferred.
+The generated CSV and Excel files are in `outputs/` on this workstation and are git-ignored to avoid publishing reviewer names or full review text. The workbook includes review results, insights, recommendations, and collection provenance. The sample mean rating is 4.42/5 (33 five-star, 8 four-star, 7 three-star, 1 two-star, and 1 one-star review). The former ASUS CM14 page returned 403 in an earlier session; it is not the product used for the current sample.
 
 ## Quick start (Windows PowerShell)
 
@@ -37,7 +40,7 @@ For CSV-only analysis, upload a CSV containing a `review_text` column. Empty or 
 3. Select one or more visible sort views and bounded pagination. Collection checks robots.txt for the review route, pauses between page actions, and reads visible review cards through Selenium.
 4. Confirm the policy/authorization checkbox and run. If a visible control or review card cannot be found, collection reports an error instead of using a private API or bypass.
 
-The scraper detects Best Buy's OneTrust overlay by its observed `onetrust-pc-dark-filter` **class** (not an ID) and uses the visible “Reject All” control to decline optional cookies. In the latest bounded local run, the overlay intercepted Show More but exposed no visible Reject All control, so collection stopped safely; this is the current live-site blocker, not a browser-driver startup failure. The collector handles transient stale review elements by reacquiring the visible DOM snapshot, but does not retry through a consent/access block. It does not infer review IDs from generic `id` or `data-testid` attributes; where the page provides no explicit review ID it creates a content-derived key. It never accepts optional cookies automatically, rotates proxies, bypasses CAPTCHAs, defeats rate limits, logs in, or evades blocking. Sort coverage can overlap and the result is deduplicated. Page changes can break selectors; verify collected counts before using the data. Selenium requires Chrome; browser/driver setup is environment-dependent.
+The scraper detects Best Buy's OneTrust overlay by its observed `onetrust-pc-dark-filter` **class** (not an ID) and uses the visible “Reject All” control to decline optional cookies. A fresh local Selenium session on the Dell URL returned Best Buy's HTTP 403 “Access Denied” page during verification; an earlier attempt encountered a consent overlay without a visible Reject All control. The separate shared browser page remained usable through normal visible controls, but that does not make the packaged Selenium run successful. The collector stops on a consent/access block; it does not retry to evade one. Where no source review ID is exposed, it creates a content-derived primary key. It never accepts optional cookies automatically, rotates proxies, bypasses CAPTCHAs, defeats rate limits, logs in, or evades blocking. Sort coverage can overlap and is deduplicated. Page changes can break selectors; verify counts before using collected data. Selenium requires Chrome; browser/driver setup is environment-dependent.
 
 ## Notebook
 
@@ -66,7 +69,7 @@ The app has been created in Community Cloud with:
 - Branch: `main`
 - Main file path: `app.py`
 
-Open the [app URL](https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/) to check startup. The live page rendered the dashboard during verification. `packages.txt` requests Chromium and its driver for optional Selenium collection; verify Cloud build logs because system package availability is host-dependent. CSV upload and sentiment analysis do not require browser binaries.
+Open the [app URL](https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/) to check the currently hosted version. The endpoint returned HTTP 200 during the latest check, but that only confirms the service responds; the hosted source is older than this local Dell update. `packages.txt` requests Chromium and its driver for optional Selenium collection; verify Cloud build logs because system package availability is host-dependent. CSV upload and sentiment analysis do not require browser binaries.
 
 ## Files
 
@@ -76,5 +79,5 @@ Open the [app URL](https://shivateja832-bestbuy-review-sentiment-analysis-app-bn
 - `packages.txt` — Chromium packages requested for Community Cloud.
 - `reports/stakeholder_report.md` — methods, risks, limitations, and recommendations.
 - `tests/` — focused tests for scraping parsing and sentiment labels.
-- `outputs/asus_cm14_bestbuy_reviews_sentiment.csv` and `.xlsx` — 50-record public-page sample and analysis, stored locally and git-ignored.
+- `outputs/dell_15_6_laptop_bestbuy_reviews_sentiment.csv` and `.xlsx` — 50-record public-page sample and analysis, stored locally and git-ignored.
 - `outputs/review_template.csv` — field-header template.

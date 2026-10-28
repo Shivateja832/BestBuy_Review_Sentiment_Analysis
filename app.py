@@ -13,8 +13,8 @@ from src.sentiment import analyze_sentiment, build_insights, recommendations
 
 DEFAULT_PRODUCT_URL = (
     "https://www.bestbuy.ca/en-ca/product/"
-    "asus-cm14-14-chromebook-mediatek-kompanio-540-4gb-lpddr5x-128gb-emmc-chromeos-"
-    "pure-grey/19826852"
+    "dell-15-6-120hz-laptop-amd-ryzen-7-7730u-16gb-ddr4-512gb-ssd-windows-11-home-"
+    "carbon-black/19821568"
 )
 
 st.set_page_config(
@@ -57,7 +57,13 @@ with st.sidebar:
         value=DEFAULT_PRODUCT_URL,
     )
     sort_options = st.multiselect("Sort views to collect", SORT_OPTIONS, default=["Most Relevant"])
-    max_pages = st.number_input("Show More pages per sort", min_value=1, max_value=100, value=6)
+    max_pages = st.number_input(
+        "Show More pages per sort",
+        min_value=1,
+        max_value=100,
+        value=100,
+        help="Collection stops when Best Buy has no visible Show More control. If this cap is reached while more reviews remain, the run reports an incomplete collection instead of presenting it as complete.",
+    )
     pause_seconds = st.slider("Pause between page actions (seconds)", 1.0, 10.0, 2.0, 0.5)
     acknowledge = st.checkbox(
         "I checked the current terms and robots.txt and am authorized to collect this public content."

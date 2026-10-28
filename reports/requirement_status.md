@@ -1,55 +1,63 @@
 # Assignment Requirement Status
 
-**Checked:** 2026-10-26
-**Live sample product:** ASUS CM14 14-inch Chromebook
-**Recruiter-style evaluation:** 80/100, evidence-based and provisional
+**Checked:** 2026-10-28
+**Current sample:** Dell 15.6-inch 120Hz laptop, AMD Ryzen 7 7730U, 16GB DDR4, 512GB SSD, Windows 11 Home
+**Sample size:** 50 visible Best Buy Canada reviews
 
-This report separates verified application behavior from external/source-data qualifications. The sample below came from visible Best Buy Canada review cards; it is not synthetic and does not represent every review for the product.
+This table evaluates the assignment requirements as written. Additional quality checks and limitations are listed separately so they are not misrepresented as extra recruiter requirements.
 
-| Assignment requirement | Status | Evidence and limitation |
-|---|---|---|
-| Python application and documented notebook | Met | Streamlit app, Selenium/Beautiful Soup collector, sentiment module, tests, and notebook are present. The notebook points to the sampled ASUS product and sample CSV. |
-| Product with at least 50 reviews | Met | The product review page displayed 434 reviews when checked. |
-| Collect at least 50 genuine reviews | Met for the stated sample deliverable | 50 distinct review cards were extracted from the visible Most Relevant view on 2026-10-26. This satisfies a 50-review sample, not an exhaustive export. |
-| Requested sort views and Show More pagination | Met for the manually verified page interaction | The page exposed and accepted Most Helpful, Newest, Highest Rating, Lowest Rating, and Most Relevant. Visible pagination loaded 10, 20, 30, 40, then 50 cards. The packaged collector's live attempt reached the page but stopped before completing pagination because of the consent overlay (see next row). |
-| Run the packaged Selenium collector end to end against Best Buy | Not met | A bounded live run launched local Chrome and reached the visible review page, but the next Show More click was intercepted by Best Buy's OneTrust consent overlay. The collector found no visible Reject All control and stopped safely. This exact six-page run did not complete; no bypass or consent choice was forced. |
-| Required fields on every sample record, including source-provided title | Not met | 49 source titles were extracted. The remaining source card exposed no title. A display title is derived from its review text and marked `generated_from_review_text` in `title_source`, but it is not the retailer-provided title. All rows have review text, date, rating, source, reviewer name, and unique SHA-256 primary keys because no stable review IDs were exposed. |
-| Sentiment labels and categories | Met | VADER text polarity is preserved as `text_sentiment`; ratings of 1–2 force the final label to Negative to prevent a known VADER mismatch. The run produced 43 Positive, 5 Negative, and 2 Neutral final labels. Human validation remains advisable. |
-| Genuine CSV and Excel deliverables | Met | `outputs/asus_cm14_bestbuy_reviews_sentiment.csv` and `.xlsx` contain the 50-row sample, sentiment results, insights, recommendations, and provenance. The files are git-ignored to avoid publishing reviewer names. |
-| Product-specific insights and recommendations | Not met for CM14-specific claims | The listing average was 4.59/5 on 434 reviews. The 50-card sample mean is 4.50/5: 37 five-star, 7 four-star, 3 three-star, and 3 one-star. Eight sampled review texts mention CX14, seven mention Intel Celeron, six mention 64GB, only one mentions CM14, and none mention MediaTek, Kompanio, or 128GB. This mismatch prevents confidently attributing themes to the CM14 hardware; the report labels them exploratory listing-level signals. |
-| Scraping constraints and stakeholder report | Met for documentation | The report documents visible-control collection, stop conditions, privacy, and non-evasion guidance. Current terms/authorization must still be checked by the user before reuse or redistribution. |
-| Deployment and tested upload workflow | Met | Commit `e7360ca` is published to `main`; GitHub Actions run #16 passed. The hosted app analyzed a synthetic-only 50-row CSV with a generated-title provenance notice and download controls; removing the file cleared the analysis and restored the empty state. |
+## Recruiter-style evaluation
 
-## Data validation
+**Evidence-based estimate: 88/100; provisional, not a guaranteed recruiter score.**
 
-- 50 records and 50 unique primary keys.
-- 50 non-empty review texts, dates in `YYYY-MM-DD`, ratings between 1 and 5.
-- 0 blank display titles. One source card had no title; the display title is derived from review text and `title_source` records this provenance.
-- The review page did not expose stable review IDs; primary keys are deterministic hashes of the available public fields.
-- The visible page showed 434 total reviews; only 50 were collected.
-- The visible review text includes multiple references to CX14 / Intel Celeron / 64GB while the product listing is CM14 / MediaTek / 128GB. This is a listing-to-review fit limitation and must be resolved before making model-specific claims.
-
-## Scope and external constraints
-
-1. The sample was gathered through visible browser interactions. The packaged Selenium collector was run once against the product page: it reached the review page, but Show More was intercepted by `.onetrust-pc-dark-filter`; no visible Reject All control was available and the collector stopped.
-2. Current Best Buy terms and any required authorization for reuse or redistribution are an operator/site-owner decision. A public page and robots.txt allowance are not permission by themselves; authorization for reuse/redistribution is not independently confirmed here.
-3. The site's later redirect to a one-time-passcode sign-in page was not pursued; no credentials, cookies, or access-control workarounds were used.
-4. A normal Best Buy search for a CX14 listing matching the sampled review text returned HTTP 403 during this audit. No alternative listing, review count, or replacement sample could therefore be verified.
-5. `robots.txt` allowed the product route and local Chrome/Selenium started; these checks do not establish permission under the site's terms. The diagnostic set the collector's confirmation parameter only to exercise its runtime path; it did not independently confirm current terms or reuse authorization.
-
-The title fallback resolves the blank display-field issue without pretending to recover an absent retailer title. The original source-title requirement for that one record remains not met. The live Selenium blocker is now localized: the consent overlay blocks Show More and presents no visible Reject All control to this automated browser session. The safe response is to stop; code must not click through an invisible/ambiguous consent UI. A user-provided authorized export or a visible permitted consent flow is needed for a successful pagination run. The product-to-review mismatch and authorization uncertainty are source/evidence limitations, not bugs. CM14-specific conclusions are not verified; the sample is not exhaustive, and automated sentiment requires human validation.
-
-## Recruiter-style score breakdown
-
-The 20-point deduction is a score gap, not 20% broken application code. It reflects missing evidence and analysis limits: the packaged collector safely stopped when a consent overlay blocked pagination without a visible reject control; Best Buy search for a matching CX14 page returned 403; the sampled review text does not consistently fit the CM14 listing; one original source title and stable source review IDs were not exposed; VADER is a heuristic without a human-labelled validation set; and current reuse authorization was not independently confirmed. A code-only change cannot honestly erase these source/evidence limits.
-
-| Dimension | Score | Rationale |
+| Area | Score | Evidence and remaining qualification |
 |---|---:|---|
-| Application design and implementation | 18/20 | Complete Streamlit workflow, visible-page collector, upload validation, sentiment labels, export actions, and documented safe-stop behavior. |
-| Data acquisition and field quality | 12/20 | 50 genuine visible records and pagination/sort controls were verified. One display title is transparently generated because the source omitted it; stable source IDs are absent, and review text contains cross-model references that prevent confident CM14-specific analysis. |
-| Sentiment analysis and business value | 14/20 | Sample metrics and recommendations are reproducible; VADER is heuristic and the listing-to-review model fit prevents strong product-specific conclusions. |
-| Documentation and stakeholder communication | 18/20 | Notebook, requirement matrix, provenance, limitations, and recommendations are documented; current terms/authorization remain an operator/site decision. |
-| Testing, reliability, and deployment | 18/20 | 27 tests passed with warnings treated as errors; all notebook code cells executed against the 50-row sample, CI passed, and hosted upload/removal smoke checks passed. A live Selenium run confirmed the consent-overlay safe-stop, not successful pagination. |
-| **Total** | **80/100** | **Strong working project with material evidence limits; not a fully validated, product-specific assessment yet.** |
+| Python application and scraping features | 18/20 | Selenium/Beautiful Soup support and visible page sort/pagination are implemented. All five sort views and 171 visible cards per view were verified with the normal browser controls; a fresh local Selenium session was blocked by Best Buy HTTP 403. |
+| Review sample and required fields | 19/20 | 50 visible reviews have all required fields and unique generated keys. The retailer did not expose a review ID; the sample is not the full 172-review population. |
+| Sentiment analysis and business findings | 17/20 | Sentiment labels and exploratory recommendations are provided. Human-labeled accuracy validation was not performed; it is a quality improvement, not an explicit assignment requirement. |
+| Deliverables and documentation | 19/20 | Notebook, CSV, workbook, and stakeholder/requirements documentation are present locally. Best Buy's current reuse/redistribution terms have not been independently confirmed. |
+| Testing, reliability, and deployment | 15/20 | The full suite passed 30/30 in the deployment clone and the staged app returned HTTP 200. The hosted version is still older at this point; live Selenium collection remains blocked by HTTP 403. |
 
-The score rates demonstrated work, not the absence of external constraints. It should not be represented as a flawless or fully exhaustive scrape.
+| Assignment requirement | Status | Evidence |
+|---|---|---|
+| Use Python and a web-scraping library | **Met** | The application includes a Python Selenium/Beautiful Soup collector and sentiment-analysis modules. |
+| Select a Best Buy Canada product with at least 50 reviews | **Met** | The selected listing displayed 172 reviews when checked. |
+| Support the requested sort options and visible pagination | **Implemented; live UI verified** | The Best Buy page exposed and accepted all five requested sorts. Normal visible Show More actions reached 171 cards in each sort before the control disappeared. A fresh local Selenium session returned HTTP 403, so this is not a successful packaged-collector run. |
+| Mine across sort views and continue through all available review pages | **Collector implemented; deliverable sample partial** | The collector supports multiple selected sort views, deduplicates overlaps, and paginates until Show More disappears. The visible page was manually verified through 171 cards in each sort, but the packaged collector was blocked by HTTP 403 and the submitted CSV/XLSX still contain 50 Most Helpful reviews, not all 171 visible cards. |
+| Collect at least 50 public reviews | **Met for the sample deliverable** | 50 distinct visible review cards were captured from the selected product's Most Helpful view. This is a sample, not all 172 reviews. |
+| Extract primary key, title, review text, date, rating, source, and reviewer name | **Met for all 50 sample records** | All required fields are populated; dates use `YYYY-MM-DD`; ratings are 1–5; all 50 titles came from the visible source cards. The retailer did not expose review IDs, so stable unique primary keys are generated from the public review fields. |
+| Provide sentiment-analysis code and categorize results | **Met** | VADER sentiment is run on review text with the star-rating-aware final label and sentiment categories. The 50-row sample has 45 Positive, 4 Negative, and 1 Neutral final label. |
+| Provide CSV and Excel outputs | **Met** | `outputs/dell_15_6_laptop_bestbuy_reviews_sentiment.csv` and `.xlsx` contain the 50 analyzed reviews. The workbook also includes insights, recommendations, and collection provenance. |
+| Explain scraping challenges and handling | **Met** | Documentation describes visible consent handling, bounded collection, backoff/stop behavior, and stopping on access denial. It explicitly rejects CAPTCHA bypass, proxy rotation to evade blocks, and hidden endpoints. |
+| Summarize customer satisfaction/dissatisfaction and recommend actions | **Met for this sample** | The stakeholder report presents sample rating/sentiment statistics, observed themes, and practical follow-up recommendations. Findings are labeled exploratory, not population estimates. |
+| Provide the notebook with code explanation | **Met** | The notebook documents setup, optional collection, data validation, analysis, and exports. Collection is opt-in and off by default. |
+| Avoid violating site policy | **Handled conservatively; verify terms for intended reuse** | The captured records came from ordinary visible review controls. The app does not evade access blocks or bypass CAPTCHA. This project does not independently establish Best Buy's current terms for redistribution or other uses. |
+
+## What is and is not an assignment requirement
+
+- The assignment requires a **primary key**, not a retailer-issued review ID. A deterministic generated key satisfies that field when the public page exposes no review ID.
+- The selected sample has source-provided titles on all 50 records. The missing-title issue applied to the superseded CM14 sample, not this current Dell sample.
+- The assignment asks for review collection, sorting, and pagination. The page behavior and all requested sort options were verified with its visible controls, but a fresh run of the packaged Selenium collector against Dell returned HTTP 403. The 50-record sample was captured through the shared visible browser page; it is not the full set of cards or a successful run of the packaged Selenium collector.
+- Human-labeled VADER accuracy testing and a guaranteed recruiter score are not stated assignment deliverables. Human validation is a prudent improvement before making high-stakes business decisions, not a reason to label the requested sentiment code absent.
+- AI-free development is not an assignment requirement. AI assistance was used for development/documentation in this work; the running sentiment classifier uses VADER and does not call a generative AI service.
+- Earlier ASUS attempts encountered HTTP 403 and a consent-overlay blocker. On 2026-10-28, a fresh Selenium session on the current Dell URL also returned HTTP 403, while the shared browser page remained usable through visible controls. These are session-dependent access outcomes; the collector does not bypass them.
+
+## Sample validation
+
+- 50 distinct records; 50 unique primary keys.
+- No missing values in the seven required columns.
+- All 50 source titles are present; all review texts are non-empty.
+- All dates parse and use `YYYY-MM-DD`; ratings are integers from 1 through 5.
+- Star rating distribution: 1 star: 1; 2 stars: 1; 3 stars: 7; 4 stars: 8; 5 stars: 33.
+- Sample mean rating: 4.42/5. Final sentiment: 45 Positive, 4 Negative, 1 Neutral.
+- Product page displayed 172 reviews; the shared browser exposed 171 review cards in each of the five requested sort views, while the submitted CSV/XLSX sample contains 50.
+
+## Validation caveat (not an additional assignment deliverable)
+
+The visible Best Buy browser page accepted all five requested sort choices and loaded 171 cards in each view with its visible Show More control until no further control appeared. The 50-record deliverable sample was analyzed/exported with the Python project functions. A fresh local Selenium run on Dell returned HTTP 403; an earlier local attempt stopped at a consent overlay without a visible Reject All control. Unit tests validate scraper logic but do not prove live retailer access. The visible browser verification does not remove the packaged integration or sample-size qualifications.
+
+The sample is not exhaustive and insights should not be generalized to all 172 reviews. Check current Best Buy terms and any authorization required before redistributing review content. Do not share reviewer names unnecessarily.
+
+## Deployment status
+
+The local Dell version is not yet deployed. The hosted Streamlit URL returned HTTP 200 on 2026-10-28, but the repository's `main` branch still contains the older ASUS requirement report. This workspace is not a Git repository and GitHub CLI authentication is unavailable here, so the local updates could not be pushed or redeployed from this environment.

@@ -2,73 +2,62 @@
 
 ## Executive summary
 
-A 50-review sample was collected from the visible review cards on the ASUS CM14 14-inch Chromebook review page on 2026-10-26. The page displayed 434 total reviews and a 4.59/5 listing average. The sample's mean star rating is 4.50/5: 37 five-star, 7 four-star, 3 three-star, and 3 one-star reviews. These are sample statistics, not estimates for all 434 reviews.
+A 50-review sample was collected from the visible customer-review cards on the Best Buy Canada listing for a Dell 15.6-inch 120Hz laptop with AMD Ryzen 7 7730U, 16GB DDR4, and 512GB SSD. The page displayed 172 reviews when checked. The sample's average star rating is 4.42/5: 33 five-star, 8 four-star, 7 three-star, 1 two-star, and 1 one-star review. These are sample statistics and should not be treated as estimates for all 172 reviews.
 
-**Important product-match caveat:** the listing is for a CM14 with MediaTek/Kompanio and 128GB storage, while 8 of the 50 captured review texts mention CX14, 7 mention Intel Celeron, 6 mention 64GB, only 1 mentions CM14, and none mention MediaTek, Kompanio, or 128GB. Treat the dataset as a sample attached to this listing, not verified CM14-specific customer feedback. The review text most often praised screen, price/value, battery, keyboard, and memory. Low-star reviews mentioned compatibility/sign-in, camera, screen/warranty, and battery concerns; these are investigation leads, not product defect estimates.
+The final text/rating-aware sentiment labels are 45 Positive, 4 Negative, and 1 Neutral. VADER is a transparent lexicon-based technique, not a trained product-specific model. Theme counts and generated recommendations are exploratory signals for follow-up, not proof of product defects or causal drivers.
 
 ## Collection method and scope
 
-- Product: ASUS CM14 14-inch Chromebook, Pure Grey.
-- Product URL: <https://www.bestbuy.ca/en-ca/product/asus-cm14-14-chromebook-mediatek-kompanio-540-4gb-lpddr5x-128gb-emmc-chromeos-pure-grey/19826852>
-- Review-page URL: <https://www.bestbuy.ca/en-ca/product/asus-cm14-14-chromebook-mediatek-kompanio-540-4gb-lpddr5x-128gb-emmc-chromeos-pure-grey/19826852/review>
-- Sort sample: Most Relevant; the public page's Most Helpful, Newest, Highest Rating, and Lowest Rating views were also selected and confirmed.
-- Pagination: visible Show More interaction increased the loaded cards 10 -> 20 -> 30 -> 40 -> 50.
-- Record fields: primary key, display title, `title_source`, review text, date, rating, source, reviewer name, product URL, collection sort, collection date, VADER score, raw text sentiment, final sentiment, and category.
-- No stable public review ID was exposed in the visible cards. The primary key is a deterministic SHA-256 digest of the product/page and available review fields. One card had no source title; its display title is derived from the opening review sentence and `title_source` explicitly identifies that fallback.
-- The live sample was captured through visible browser interactions and processed with the project's Python sentiment/export code. A successful live run of the packaged Selenium collector itself has not been demonstrated.
-- A normal Best Buy search for a CX14 listing matching the review text returned HTTP 403 during the audit. No matching product page or review count could be verified, so model-specific insights must not be presented as established findings.
-- The sample workbook and CSV are generated under `outputs/` and are git-ignored so reviewer names are not published in the public repository.
+- Product: Dell 15.6-inch 120Hz laptop, AMD Ryzen 7 7730U, 16GB DDR4, 512GB SSD, Windows 11 Home, Carbon Black.
+- Product URL: <https://www.bestbuy.ca/en-ca/product/dell-15-6-120hz-laptop-amd-ryzen-7-7730u-16gb-ddr4-512gb-ssd-windows-11-home-carbon-black/19821568>
+- Review page: <https://www.bestbuy.ca/en-ca/product/dell-15-6-120hz-laptop-amd-ryzen-7-7730u-16gb-ddr4-512gb-ssd-windows-11-home-carbon-black/19821568/review>
+- Displayed review total at collection: 172.
+- Sort view used for the sample: Most Helpful. The visible page offered and accepted Most Helpful, Newest, Highest Rating, Lowest Rating, and Most Relevant.
+- Pagination: ordinary visible Show More clicks were verified through 171 visible cards in each of the five requested sort views, after which Show More disappeared. The submitted sample remains the first 50 Most Helpful records.
+- Required fields: primary key, source title, review text, date, rating, source, reviewer name. All 50 records passed non-empty-field checks; dates are normalized as `YYYY-MM-DD`.
+- No retailer-issued review ID was exposed, so each primary key is a deterministic SHA-256 hash of available public review fields.
+- The shared browser UI was used to capture the submitted 50 visible cards; the Python sentiment and export functions processed them. A separate fresh local Selenium run was not successful.
+- Exports are stored locally under `outputs/` and are git-ignored to avoid publishing reviewer names and full review text.
 
 ## Sentiment approach and results
 
-VADER produces a text-only compound score from -1 to +1 and a `text_sentiment` label. During validation, VADER gave a positive score to a clearly one-star complaint mentioning slow performance and freezing. To avoid labeling a 1–2 star review as favorable, the final `sentiment` field applies a documented low-rating override: ratings of 1 or 2 are Negative; other reviews use the VADER threshold (>= 0.05 Positive, <= -0.05 Negative, otherwise Neutral). Both the raw text label and final label are retained for audit.
+VADER produces a text-only compound score and `text_sentiment` label. The final sentiment keeps that signal while applying the documented low-rating rule: ratings of 1–2 are Negative; for other ratings, VADER thresholds classify Positive (compound >= 0.05), Negative (<= -0.05), or Neutral. Both raw text polarity and final sentiment remain in the output for audit.
 
 | Final sentiment | Reviews | Share |
 |---|---:|---:|
-| Positive | 43 | 86% |
-| Negative | 5 | 10% |
-| Neutral | 2 | 4% |
+| Positive | 45 | 90% |
+| Negative | 4 | 8% |
+| Neutral | 1 | 2% |
 
-This rule is a transparent heuristic, not a trained product-specific model. A human-coded sample is needed before decisions, especially for mixed-language, sarcastic, or contradictory text/rating records.
+The mean customer star rating is 4.42/5. Sentiment is not identical to star rating: it uses the review text and the documented low-rating override. A human-coded sample should be compared with the model before operational decisions, particularly for sarcasm, mixed sentiment, and language variation.
 
-## Potential drivers and recommended actions
+## Observed signals and recommendations
 
-### Satisfaction signals observed
+The sample's most frequent positive text terms included price, purchase, nice, screen, battery, fast, performance, and ease-related language. Negative text signals included battery/heat, returns, and performance issues. Word counts do not account for context; they identify review passages worth reading, not definitive feature rankings.
 
-- Screen/display quality and keyboard usability are recurring positive comments.
-- Value/price, ease of setup, and suitability for basic school, browsing, and streaming tasks are also mentioned.
-- Battery is a mixed theme: some customers liked runtime, while a lower-star review expected longer life.
+Recommendations for follow-up:
 
-### Dissatisfaction signals observed
+1. Review the low-star records individually and classify the issue type (battery/heat, reliability/performance, display, or other) before prioritizing engineering work.
+2. Compare review signals with return reasons, support contacts, and warranty outcomes for this exact listing/model.
+3. Keep value, screen quality, and performance as hypotheses for satisfaction drivers; validate them with aspect-level coding rather than keyword frequency alone.
+4. Manually label a stratified subset of reviews and compare human sentiment with VADER, reporting precision/recall or agreement before using scores for decisions.
+5. Repeat the sample at another time and compare themes, while noting that the first 50 Most Helpful-ordered reviews are not a random sample.
 
-- One one-star review described slow performance, freezes, software/browser incompatibility, and difficulty signing in as administrator.
-- Other low-rating comments described a camera access issue and a failed screen with a warranty concern.
-- One three-star review liked the value but expected better battery life.
+## Scraping challenges and safe handling
 
-### Recommendations
-
-1. Review compatibility guidance and setup instructions for browser requirements, administrator access, and account configuration before purchase.
-2. Check camera permission troubleshooting guidance and support resolution outcomes before attributing the issue to hardware.
-3. Review screen-failure and warranty cases for recurring patterns by model/production date; do not infer a defect rate from one review.
-4. Compare battery expectations in product claims with tests under common school/browsing workloads.
-5. Manually code all low-star reviews and a stratified sample of other ratings, then compare human labels with VADER and the rating override.
-6. Repeat collection at documented intervals and compare themes with returns, service, and support-contact data before prioritizing investment.
-
-## Scraping constraints and safe-stop behavior
-
-- Use only a direct Best Buy Canada product URL; the project rejects search URLs and checks robots.txt before its Selenium collection run.
-- Check current terms and the applicable authorization for the intended collection and redistribution. A public product page alone does not establish permission. The terms could not be confirmed during this work.
-- Respect visible consent choices. The collector only uses a visible site-provided Reject All control; if the choice is unavailable or the control remains blocked, stop.
-- Do not rotate proxies, bypass CAPTCHA, use private endpoints, log in, reuse cookies, defeat rate limits, or automate around access-denied pages.
-- Use bounded page counts and pauses. Stop on 403/429, CAPTCHA, access denial, sign-in/OTP redirect, changed markup, or a blocked control. Do not treat retries as a way around a block.
-- The browser later redirected to an OTP sign-in page after sort interactions. No sign-in, one-time code, session cookie, or workaround was attempted.
-- The packaged Selenium collector was run against the selected public page. It reached the review page, but Show More was intercepted by a OneTrust consent overlay with no visible Reject All control; it stopped without bypassing the overlay. The 50 records in this report were captured via visible browser interactions and processed locally, not by that collector run.
-- Reviewer names are personal data. Keep exports access-controlled, share only when permitted, and consider anonymizing reviewer names in recruiter-facing copies.
+- Collection used a direct Best Buy Canada product review page and ordinary visible sort and Show More controls.
+- The requested sort choices were available and accepted in the browser. Each sort view reached 171 visible cards using ordinary Show More controls; only the 50-record Most Helpful sample is included in the deliverables.
+- A fresh Selenium session on the Dell URL returned HTTP 403; an earlier local run encountered a consent overlay without a visible Reject All control. The collector stops when it encounters a blocked/ambiguous consent control, access denial, CAPTCHA, or rate limit.
+- Use a visible site-provided consent option when present. If no valid visible choice is available, stop and ask the site owner or use an authorized route.
+- Use bounded page actions and respectful pauses. On transient network errors, retry only within conservative limits and stop if the site continues to deny access; do not use retries to evade a block.
+- Do not rotate proxies to evade restrictions, bypass CAPTCHA, automate hidden endpoints, reuse login cookies, or defeat rate limits. These are not appropriate fixes for access denial.
+- Current Best Buy terms and any authorization required for redistribution must be checked before sharing review text. Reviewer names should be handled as personal data and omitted from external summaries unless needed and permitted.
 
 ## Deliverables and limitations
 
-- Local review-level CSV: `outputs/asus_cm14_bestbuy_reviews_sentiment.csv`
-- Local Excel workbook: `outputs/asus_cm14_bestbuy_reviews_sentiment.xlsx` (Reviews, Insights, Recommendations, Collection sheets)
-- Python analysis application, visible-page Selenium collector, notebook, and tests are in the project.
-- This is a 50-card sample, not a complete export of 434 reviews. One source title was unavailable and is transparently derived in the display field; review text indicates possible cross-model aggregation. Current terms and any required reuse/redistribution authorization are the operator's responsibility.
-- The requirement matrix gives the project a recruiter-style evidence score of 80/100, with deductions for field/model fit, lack of a live packaged-Selenium run, and the heuristic sentiment method.
+- Review-level CSV: `outputs/dell_15_6_laptop_bestbuy_reviews_sentiment.csv`
+- Excel workbook: `outputs/dell_15_6_laptop_bestbuy_reviews_sentiment.xlsx` (Reviews, Insights, Recommendations, and Collection sheets)
+- Python Streamlit application, visible-page Selenium collector, notebook, tests, and requirement matrix are included in the project.
+- This is a 50-record sample, not a full export of the 171 visible cards or the page's displayed total of 172 reviews.
+- The visible-page sorting and pagination behavior is verified. The packaged Selenium collector did not complete live because Best Buy returned HTTP 403 in a fresh session; this is not hidden or reported as a successful collection.
+- The former ASUS CM14 page also returned HTTP 403 in an earlier session. The current Dell sample is distinct from that superseded sample.
