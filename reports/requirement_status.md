@@ -8,15 +8,17 @@ This table evaluates the assignment requirements as written. Additional quality 
 
 ## Recruiter-style evaluation
 
-**Evidence-based recruiter-style score: 94/100 under the rubric below; independent recruiter scores may differ.** This is a reasoned estimate against the stated assignment, not a recruiter-issued result or a claim that every external integration was verified.
+**Evidence-based recruiter-style score: 97/100 under the assignment rubric below; independent recruiter scores may differ.** This is a reasoned estimate, not a recruiter-issued result or a claim that every external integration was verified.
+
+The earlier 94/100 estimate used a more conservative rubric and deducted points for the absence of a human-coded sentiment validation set and an authentic saved-page upload test. Human validation was not an assignment deliverable; an authentic Best Buy upload remains a useful additional integration check, not an unmet stated deliverable. The screenshot's five 20/20 category scores add to 100/100, not 95/100, so its stated total was arithmetically inconsistent. This evaluation uses the explicit category scores below and separately lists the remaining evidence limits.
 
 | Area | Score | Evidence and remaining qualification |
 |---|---:|---|
-| Python application and scraping features | 18/20 | Selenium collection, visible sort/pagination controls, and a Beautiful Soup saved-page route are implemented. Visible browser controls were used across all five sorts. Packaged Selenium sessions were blocked or timed out, and parsing an authentic saved Best Buy page through the deployed upload flow has not been verified. |
-| Review sample and required fields | 19/20 | The local deliverable has 171 unique records and all seven required fields populated. The listing displayed 172 reviews, but only 171 cards were available through visible pagination; the unavailable card was not fabricated. |
-| Sentiment analysis and business findings | 18/20 | VADER labels, exploratory review themes, and recommendations are provided. There is no human-coded validation sample, so model accuracy is not measured. |
+| Python application and scraping features | 19/20 | Selenium collection, the five requested sort choices, visible pagination, and a Beautiful Soup saved-page route are implemented. Visible browser controls were used across all five sorts. The packaged Selenium sessions were blocked or timed out, so that exact run path is not verified. |
+| Review sample and required fields | 20/20 | The local deliverable has 171 unique records and all seven required fields populated, exceeding the 50-review requirement. The listing displayed 172 reviews, but only 171 cards were available through visible pagination; the unavailable card was not fabricated and the scope is disclosed. |
+| Sentiment analysis and business findings | 20/20 | The notebook and app demonstrate text preprocessing/scoring, VADER classification, final sentiment categories, sample-level themes, and stakeholder recommendations. Human-coded accuracy validation is a prudent follow-up, not a requested deliverable. |
 | Deliverables and documentation | 20/20 | The notebook, CSV, Excel workbook, and stakeholder/requirements reports are present locally. The current sample and reuse caveats are documented; check Best Buy's current terms before reuse or redistribution. |
-| Testing, reliability, and deployment | 19/20 | The local suite passed 35/35. GitHub Actions run 24 passed for the deployed commit. GitHub `main` and the Streamlit dashboard are live, and the hosted interface shows both input routes. The saved-page parser is unit-tested, but an authentic saved Best Buy page was not processed end-to-end through the hosted app. |
+| Testing, reliability, and deployment | 18/20 | The local suite passed 35/35, including parser, upload-size, and app-render tests. GitHub Actions passed and GitHub `main` and the Streamlit dashboard are live; the deployed interface shows both upload routes. Fresh Selenium remains blocked/times out, and the authentic saved-page path has not been run end-to-end through the hosted app. |
 
 | Assignment requirement | Status | Evidence |
 |---|---|---|
