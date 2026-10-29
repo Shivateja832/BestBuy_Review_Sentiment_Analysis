@@ -53,7 +53,7 @@ DEFAULT_REVIEW_CARD_SELECTORS = (
 )
 USER_AGENT = "BestBuyReviewSentimentAnalysis/1.0 (user-initiated public-page review export)"
 CONSENT_OVERLAY_SELECTOR = ".onetrust-pc-dark-filter"
-MAX_SAVED_REVIEW_PAGE_BYTES = 25 * 1024 * 1024
+MAX_SAVED_REVIEW_PAGE_BYTES = 20 * 1024 * 1024
 
 
 @dataclass(frozen=True)
@@ -308,7 +308,7 @@ def parse_saved_review_pages(
             raise ValueError(f"{filename} is empty.")
         if len(contents) > MAX_SAVED_REVIEW_PAGE_BYTES:
             raise ValueError(
-                f"{filename} exceeds the 25 MB per-page limit. Save only the review page."
+                f"{filename} exceeds the 20 MB per-page limit. Save only the review page."
             )
         try:
             html = contents.decode("utf-8-sig")

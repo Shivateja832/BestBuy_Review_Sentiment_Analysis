@@ -16,7 +16,7 @@ This table evaluates the assignment requirements as written. Additional quality 
 | Review sample and required fields | 20/20 | 171 distinct visible reviews across all five sort views have all required fields and unique generated keys. The page displayed 172 reviews, but only 171 cards were available through visible pagination. |
 | Sentiment analysis and business findings | 20/20 | VADER sentiment categories, exploratory themes, and stakeholder recommendations were generated from the 171-review export. |
 | Deliverables and documentation | 20/20 | Notebook, 171-row CSV, workbook, and stakeholder/requirements documentation are present locally. Check current Best Buy terms before reuse or redistribution. |
-| Testing, reliability, and deployment | 18/20 | The full suite passed 34/34, including the saved-HTML fallback tests. The latest source update still needs GitHub Actions and hosted-deployment verification. Fresh Selenium access remains site-dependent, with the HTML upload route available as fallback. |
+| Testing, reliability, and deployment | 18/20 | The full suite passed 35/35, including saved-HTML parsing and upload-size validation. The latest source update still needs GitHub Actions and hosted-deployment verification. Fresh Selenium access remains site-dependent, with the HTML upload route available as fallback. |
 
 | Assignment requirement | Status | Evidence |
 |---|---|---|

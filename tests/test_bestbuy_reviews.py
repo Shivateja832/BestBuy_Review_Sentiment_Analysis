@@ -3,6 +3,7 @@ from src.bestbuy_reviews import (
     _additional_reviews_loaded,
     _reject_optional_cookies,
     _raise_if_access_denied,
+    MAX_SAVED_REVIEW_PAGE_BYTES,
     _review_page_url,
     _visible_review_html,
     parse_review_cards,
@@ -496,6 +497,20 @@ def test_saved_review_page_requires_supported_review_cards():
         assert "No supported visible review cards" in str(exc)
     else:
         raise AssertionError("An HTML page without review cards must fail.")
+
+
+def test_saved_review_page_enforces_upload_size_limit():
+    oversized_page = b"x" * (MAX_SAVED_REVIEW_PAGE_BYTES + 1)
+
+    try:
+        parse_saved_review_pages(
+            [("oversized.html", oversized_page)],
+            "https://www.bestbuy.ca/en-ca/product/example/123456",
+        )
+    except ValueError as exc:
+        assert "20 MB per-page limit" in str(exc)
+    else:
+        raise AssertionError("An oversized saved review page must be rejected.")
 
 
 def test_repeated_data_testid_does_not_collapse_distinct_reviews():
