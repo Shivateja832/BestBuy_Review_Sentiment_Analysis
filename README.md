@@ -12,7 +12,7 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 - Site compliance: the sample was collected using visible Best Buy page controls only, without private APIs, login, proxy rotation, CAPTCHA bypass, or access-control evasion. Check current terms and any authorization needed for reuse or redistribution.
 - Local smoke test: the current local Streamlit app returned HTTP 200.
 - Tests: the full suite passed 35/35 after adding saved-page HTML parsing, upload support, and upload-size validation. The live sample was collected through the shared browser's visible controls; fresh standalone Selenium sessions returned HTTP 403 or timed out.
-- Deployment: GitHub `main` is at `e6c0da2`; GitHub Actions run 23 passed. The hosted Streamlit dashboard loads with both CSV and saved-HTML upload routes visible. A stale module caused a temporary import failure after the first push; rebooting the Streamlit app resolved it. This confirms app deployment, not reliable live access from a fresh standalone Selenium session.
+- Deployment: GitHub `main` is at `14f9319`; [GitHub Actions run 24](https://github.com/Shivateja832/BestBuy_Review_Sentiment_Analysis/actions/runs/40879454992) passed. The hosted Streamlit dashboard was reloaded and displays both CSV and saved-HTML upload routes. A stale module caused a temporary import failure after the first push; rebooting the Streamlit app resolved it. This confirms app deployment, not reliable live access from a fresh standalone Selenium session.
 - AI disclosure: AI assistance was used during development and documentation. At runtime, sentiment classification uses the VADER lexicon-based method; the app does not call a generative AI model.
 
 App URL: <https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/>
@@ -70,7 +70,7 @@ The app has been created in Community Cloud with:
 - Branch: `main`
 - Main file path: `app.py`
 
-The current source was pushed to GitHub `main` at commit `204186c` and passed GitHub Actions. The [app URL](https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/) returned HTTP 200 and rendered the dashboard after the push. `packages.txt` requests Chromium and its driver for optional Selenium collection; verify Cloud build logs because system package availability is host-dependent. CSV upload and sentiment analysis do not require browser binaries. Best Buy access from a fresh Selenium session remains blocked by HTTP 403.
+The current source and status documentation were pushed to GitHub `main` at commit `14f9319`; [GitHub Actions run 24](https://github.com/Shivateja832/BestBuy_Review_Sentiment_Analysis/actions/runs/40879454992) passed. The [app URL](https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/) rendered the dashboard after the update, with both upload routes visible. `packages.txt` requests Chromium and its driver for optional Selenium collection; system package availability is host-dependent. CSV upload and sentiment analysis do not require browser binaries. Best Buy access from fresh standalone Selenium sessions returned HTTP 403 or timed out; the saved-HTML parser has unit coverage, but has not been run on an authentic saved Best Buy page through the hosted app.
 
 ## Files
 

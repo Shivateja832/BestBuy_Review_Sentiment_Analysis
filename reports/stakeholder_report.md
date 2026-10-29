@@ -62,3 +62,4 @@ Recommendations for follow-up:
 - The export contains all 171 cards available through visible pagination, not all 172 reviews stated in the page header; one review was unavailable through the visible control.
 - Live visible-page sorting and pagination were used to collect and export 171 unique review cards. Standalone Selenium did not complete in a fresh session; browser-saved HTML is the app's tested alternative, not a bypass or a claim that Selenium succeeded.
 - The former ASUS CM14 page also returned HTTP 403 in an earlier session. The current Dell sample is distinct from that superseded sample.
+- The deployed app's CSV and saved-HTML upload controls were verified after the latest Streamlit reboot. The parser is covered by synthetic-fixture tests, but an authentic Best Buy saved page has not been processed end-to-end through the hosted app.
