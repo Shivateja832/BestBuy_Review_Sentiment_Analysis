@@ -62,3 +62,14 @@ def test_removing_uploaded_csv_clears_its_previous_analysis():
     assert app.session_state["reviews"].empty
     assert app.session_state["uploaded_file_name"] is None
     assert any("Upload a review CSV" in message.value for message in app.info)
+
+
+def test_dashboard_renders_saved_html_review_upload_option():
+    app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py")).run(
+        timeout=120
+    )
+
+    assert not app.exception
+    upload_labels = [uploader.label for uploader in app.get("file_uploader")]
+    assert "Upload an existing review CSV" in upload_labels
+    assert "Or upload browser-saved Best Buy review pages" in upload_labels

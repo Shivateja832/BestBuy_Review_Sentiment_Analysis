@@ -16,7 +16,7 @@ The final text/rating-aware sentiment labels are 156 Positive, 12 Negative, and 
 - Pagination: ordinary visible Show More clicks loaded 171 visible cards in each sort view, after which Show More disappeared. The five sets were deduplicated to 171 unique reviews.
 - Required fields: primary key, source title, review text, date, rating, source, reviewer name. All 171 records passed non-empty-field checks; dates are normalized as `YYYY-MM-DD`.
 - No retailer-issued review ID was exposed, so each primary key is a deterministic SHA-256 hash of available public review fields.
-- The shared browser's visible controls were used to capture the review cards; the project's Python sentiment and export functions processed them. A separate fresh local Selenium run returned HTTP 403 and did not complete.
+- The shared browser's visible controls were used to capture the review cards; the project's Python sentiment and export functions processed them. Fresh standalone Selenium sessions returned HTTP 403 or timed out; the app now includes a Beautiful Soup route for saved visible-page HTML.
 - Exports are stored locally under `outputs/` and are git-ignored to avoid publishing reviewer names and full review text.
 
 ## Sentiment approach and results
@@ -48,6 +48,7 @@ Recommendations for follow-up:
 - Collection used a direct Best Buy Canada product review page and ordinary visible sort and Show More controls.
 - All five requested sort choices were available and accepted in the browser. Each sort view reached 171 visible cards using ordinary Show More controls; the deliverable contains their 171-record deduplicated set.
 - A fresh Selenium session on the Dell URL returned HTTP 403; an earlier local run encountered a consent overlay without a visible Reject All control. The collector stops when it encounters a blocked/ambiguous consent control, access denial, CAPTCHA, or rate limit.
+- When standalone Selenium is denied, save the rendered review page after using Best Buy's visible controls and upload the HTML to the app. The Beautiful Soup parser validates required fields and deduplicates overlapping sort views.
 - Use a visible site-provided consent option when present. If no valid visible choice is available, stop and ask the site owner or use an authorized route.
 - Use bounded page actions and respectful pauses. On transient network errors, retry only within conservative limits and stop if the site continues to deny access; do not use retries to evade a block.
 - Do not rotate proxies to evade restrictions, bypass CAPTCHA, automate hidden endpoints, reuse login cookies, or defeat rate limits. These are not appropriate fixes for access denial.
@@ -59,5 +60,5 @@ Recommendations for follow-up:
 - Excel workbook: `outputs/dell_15_6_laptop_bestbuy_reviews_sentiment.xlsx` (Reviews, Insights, Recommendations, and Collection sheets)
 - Python Streamlit application, visible-page Selenium collector, notebook, tests, and requirement matrix are included in the project.
 - The export contains all 171 cards available through visible pagination, not all 172 reviews stated in the page header; one review was unavailable through the visible control.
-- Live visible-page sorting and pagination were used to collect and export 171 unique review cards. The packaged Selenium collector did not complete in a fresh local session because Best Buy returned HTTP 403; this is not hidden or reported as a successful Selenium run.
+- Live visible-page sorting and pagination were used to collect and export 171 unique review cards. Standalone Selenium did not complete in a fresh session; browser-saved HTML is the app's tested alternative, not a bypass or a claim that Selenium succeeded.
 - The former ASUS CM14 page also returned HTTP 403 in an earlier session. The current Dell sample is distinct from that superseded sample.

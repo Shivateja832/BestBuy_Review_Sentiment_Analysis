@@ -6,6 +6,7 @@ from src.bestbuy_reviews import (
     _review_page_url,
     _visible_review_html,
     parse_review_cards,
+    parse_saved_review_pages,
     validate_product_url,
 )
 
@@ -432,6 +433,69 @@ def test_parse_bestbuy_review_list_markup():
     assert review["rating"] == 4.0
     assert review["reviewer_name"] == "Jordan"
     assert len(str(review["primary_key"])) == 64
+
+
+def test_saved_visible_review_pages_extract_and_deduplicate_records():
+    html = b"""
+    <ul>
+      <li class="review_abc" data-automation="review-list-item">
+        <p class="sr-only">Customer rating: 5 out of 5 stars</p>
+        <h3 class="reviewTitle_abc">Great value</h3>
+        <div class="reviewerInfo_abc">Reviewed by Jordan - May 2, 2026</div>
+        <time datetime="2026-05-02T10:00:00Z"></time>
+        <div class="reviewContent_abc">Fast and reliable laptop.</div>
+      </li>
+    </ul>
+    """
+    product_url = "https://www.bestbuy.ca/en-ca/product/example/123456"
+
+    reviews = parse_saved_review_pages(
+        [("helpful.html", html), ("newest.html", html)],
+        product_url,
+    )
+
+    assert len(reviews) == 1
+    review = reviews.iloc[0]
+    assert review["title"] == "Great value"
+    assert review["review_text"] == "Fast and reliable laptop."
+    assert review["reviewer_name"] == "Jordan"
+    assert review["date"] == "2026-05-02"
+    assert review["rating"] == 5
+    assert review["source"] == product_url
+    assert len(review["primary_key"]) == 64
+
+
+def test_saved_review_page_rejects_missing_required_fields():
+    html = b"""
+    <article data-review-id="review-1">
+      <h3>Good screen</h3>
+      <p class="review-text">The screen is bright.</p>
+      <time datetime="2026-05-02"></time>
+      <p class="sr-only">Customer rating: 4 out of 5 stars</p>
+    </article>
+    """
+
+    try:
+        parse_saved_review_pages(
+            [("incomplete.html", html)],
+            "https://www.bestbuy.ca/en-ca/product/example/123456",
+        )
+    except ValueError as exc:
+        assert "reviewer_name" in str(exc)
+    else:
+        raise AssertionError("A saved record with missing required fields must fail.")
+
+
+def test_saved_review_page_requires_supported_review_cards():
+    try:
+        parse_saved_review_pages(
+            [("empty.html", b"<html><body>No review cards</body></html>")],
+            "https://www.bestbuy.ca/en-ca/product/example/123456",
+        )
+    except ValueError as exc:
+        assert "No supported visible review cards" in str(exc)
+    else:
+        raise AssertionError("An HTML page without review cards must fail.")
 
 
 def test_repeated_data_testid_does_not_collapse_distinct_reviews():

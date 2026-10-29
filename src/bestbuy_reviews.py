@@ -53,6 +53,7 @@ DEFAULT_REVIEW_CARD_SELECTORS = (
 )
 USER_AGENT = "BestBuyReviewSentimentAnalysis/1.0 (user-initiated public-page review export)"
 CONSENT_OVERLAY_SELECTOR = ".onetrust-pc-dark-filter"
+MAX_SAVED_REVIEW_PAGE_BYTES = 25 * 1024 * 1024
 
 
 @dataclass(frozen=True)
@@ -281,6 +282,69 @@ def parse_review_cards(
             }
         )
     return records
+
+
+def parse_saved_review_pages(
+    pages: Iterable[tuple[str, bytes]],
+    product_url: str,
+) -> pd.DataFrame:
+    """Parse browser-saved public review pages and deduplicate visible card records."""
+    clean_url = validate_product_url(product_url)
+    page_list = list(pages)
+    if not page_list:
+        raise ValueError("Upload at least one browser-saved Best Buy review page.")
+
+    collected: dict[str, dict[str, object]] = {}
+    required_fields = (
+        "title",
+        "review_text",
+        "date",
+        "rating",
+        "source",
+        "reviewer_name",
+    )
+    for filename, contents in page_list:
+        if not contents:
+            raise ValueError(f"{filename} is empty.")
+        if len(contents) > MAX_SAVED_REVIEW_PAGE_BYTES:
+            raise ValueError(
+                f"{filename} exceeds the 25 MB per-page limit. Save only the review page."
+            )
+        try:
+            html = contents.decode("utf-8-sig")
+        except UnicodeDecodeError as exc:
+            raise ValueError(f"{filename} is not valid UTF-8 HTML.") from exc
+
+        page_reviews = parse_review_cards(html, clean_url, source=clean_url)
+        if not page_reviews:
+            raise ValueError(
+                f"No supported visible review cards were found in {filename}. "
+                "Save the page after loading review cards with Best Buy's visible controls."
+            )
+        for review in page_reviews:
+            missing = [
+                field
+                for field in required_fields
+                if review[field] is None or not str(review[field]).strip()
+            ]
+            if missing:
+                raise ValueError(
+                    f"{filename} contains a review missing required fields: "
+                    f"{', '.join(missing)}."
+                )
+            try:
+                review["rating"] = float(review["rating"])
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"{filename} contains an invalid review rating.") from exc
+            collected.setdefault(str(review["primary_key"]), review)
+
+    if not collected:
+        raise ValueError("No complete review records were found in the uploaded pages.")
+    frame = pd.DataFrame(collected.values(), columns=REVIEW_COLUMNS)
+    frame["date"] = frame["date"].astype("string")
+    return frame.sort_values(["date", "primary_key"], ascending=[False, True]).reset_index(
+        drop=True
+    )
 
 
 def _select_sort(driver: webdriver.Chrome, label: str, timeout: int) -> None:

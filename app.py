@@ -7,7 +7,13 @@ import pandas as pd
 import streamlit as st
 from selenium.common.exceptions import WebDriverException
 
-from src.bestbuy_reviews import REVIEW_COLUMNS, SORT_OPTIONS, ScrapeSettings, scrape_reviews
+from src.bestbuy_reviews import (
+    REVIEW_COLUMNS,
+    SORT_OPTIONS,
+    ScrapeSettings,
+    parse_saved_review_pages,
+    scrape_reviews,
+)
 from src.data_io import load_review_csv
 from src.sentiment import analyze_sentiment, build_insights, recommendations
 
@@ -50,6 +56,20 @@ with st.sidebar:
     st.subheader("Data source")
     uploaded = st.file_uploader("Upload an existing review CSV", type=["csv"])
     st.caption("CSV must include review_text. Other standard fields are retained when available.")
+    html_uploads = st.file_uploader(
+        "Or upload browser-saved Best Buy review pages",
+        type=["html", "htm"],
+        accept_multiple_files=True,
+        help=(
+            "Use Best Buy's visible sort and Show More controls, then save the rendered "
+            "review page as HTML. Upload one or more sort views; overlapping cards are "
+            "deduplicated. This is a compliant fallback when a fresh Selenium session is blocked."
+        ),
+    )
+    html_policy_confirmed = st.checkbox(
+        "I am authorized to analyze these pages and checked Best Buy's current terms.",
+        disabled=not bool(html_uploads),
+    )
     st.divider()
     st.subheader("Optional public-page collection")
     product_url = st.text_input(
@@ -73,26 +93,52 @@ with st.sidebar:
         "is available. No CAPTCHA bypass, proxy rotation, login, private API, or access-control "
         "evasion; collection stops if a consent choice is unavailable or access is blocked."
     )
-    if uploaded is not None:
-        st.caption("Remove the uploaded CSV before starting a public-page collection.")
+    if uploaded is not None or html_uploads:
+        st.caption("Remove uploaded review files before starting a new public-page collection.")
     scrape_button = st.button(
         "Collect public reviews",
         type="primary",
         use_container_width=True,
-        disabled=uploaded is not None,
+        disabled=uploaded is not None or bool(html_uploads),
     )
 
 if "reviews" not in st.session_state:
     st.session_state.reviews = pd.DataFrame(columns=REVIEW_COLUMNS)
 if "uploaded_file_name" not in st.session_state:
     st.session_state.uploaded_file_name = None
-if uploaded is not None:
+if uploaded is not None and html_uploads:
+    st.session_state.reviews = pd.DataFrame(columns=REVIEW_COLUMNS)
+    st.session_state.uploaded_file_name = "conflicting review uploads"
+    st.error("Upload either a review CSV or saved HTML pages, not both.")
+elif uploaded is not None:
     st.session_state.uploaded_file_name = uploaded.name
     try:
         st.session_state.reviews = load_review_csv(uploaded)
     except ValueError as exc:
         st.session_state.reviews = pd.DataFrame(columns=REVIEW_COLUMNS)
         st.error(f"Could not read the selected CSV: {exc}")
+elif html_uploads:
+    st.session_state.uploaded_file_name = "html:" + "|".join(
+        uploaded_page.name for uploaded_page in html_uploads
+    )
+    if not html_policy_confirmed:
+        st.session_state.reviews = pd.DataFrame(columns=REVIEW_COLUMNS)
+        st.error("Confirm authorization and current terms before analyzing saved review pages.")
+    else:
+        try:
+            st.session_state.reviews = parse_saved_review_pages(
+                [
+                    (uploaded_page.name, uploaded_page.getvalue())
+                    for uploaded_page in html_uploads
+                ],
+                product_url,
+            )
+            st.success(
+                f"Parsed {len(st.session_state.reviews):,} unique reviews from saved visible pages."
+            )
+        except (ValueError, PermissionError) as exc:
+            st.session_state.reviews = pd.DataFrame(columns=REVIEW_COLUMNS)
+            st.error(f"Could not parse saved review pages: {exc}")
 elif st.session_state.uploaded_file_name is not None:
     st.session_state.reviews = pd.DataFrame(columns=REVIEW_COLUMNS)
     st.session_state.uploaded_file_name = None
@@ -127,7 +173,8 @@ if scrape_button:
 raw_reviews = st.session_state.reviews.copy()
 if raw_reviews.empty:
     st.info(
-        "Upload a review CSV or use the optional collector. No scraped data is bundled, "
+        "Upload a review CSV, browser-saved review page HTML, or use the optional collector. "
+        "No scraped data is bundled, "
         "and this app never invents review content."
     )
     st.markdown(
