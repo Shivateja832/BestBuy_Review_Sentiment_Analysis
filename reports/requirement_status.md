@@ -16,7 +16,7 @@ This table evaluates the assignment requirements as written. Additional quality 
 | Review sample and required fields | 20/20 | 171 distinct visible reviews across all five sort views have all required fields and unique generated keys. The page displayed 172 reviews, but only 171 cards were available through visible pagination. |
 | Sentiment analysis and business findings | 20/20 | VADER sentiment categories, exploratory themes, and stakeholder recommendations were generated from the 171-review export. |
 | Deliverables and documentation | 20/20 | Notebook, 171-row CSV, workbook, and stakeholder/requirements documentation are present locally. Check current Best Buy terms before reuse or redistribution. |
-| Testing, reliability, and deployment | 18/20 | The full suite passed 35/35, including saved-HTML parsing and upload-size validation. The latest source update still needs GitHub Actions and hosted-deployment verification. Fresh Selenium access remains site-dependent, with the HTML upload route available as fallback. |
+| Testing, reliability, and deployment | 18/20 | The full local suite passed 35/35, including saved-HTML parsing and upload-size validation; GitHub Actions run 23 passed for the application-code commit. GitHub main and Streamlit are live, and the hosted app displays both input routes. A stale Streamlit module caused an import failure after the first push; rebooting the app cleared it. Fresh Selenium access remains site-dependent, with the saved-HTML route as fallback. |
 
 | Assignment requirement | Status | Evidence |
 |---|---|---|
@@ -61,4 +61,4 @@ One of the 172 reviews displayed by the listing was not available among the visi
 
 ## Deployment status
 
-The app and review-data documentation were previously pushed to GitHub `main`. This update adds a Beautiful Soup fallback for saved visible-page HTML; deployment verification will be recorded after the updated source is pushed. Fresh standalone Selenium remains subject to Best Buy's HTTP 403/timeout behavior.
+Application code is on GitHub `main` at commit `e6c0da26e3d35555a7d1683a583e8b2bdfc75419`; GitHub Actions run 23 passed. The Streamlit Cloud app was rebooted after its first post-push start used a mismatched cached module and raised `ImportError`. After reboot, the deployed dashboard loaded with the CSV and saved-HTML uploaders visible; the HTML upload control reports the configured 20 MB per-file limit. The hosted HTML parser was not tested with an authentic saved Best Buy page in this environment. Fresh standalone Selenium remains subject to Best Buy's HTTP 403/timeout behavior.
