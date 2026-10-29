@@ -149,6 +149,9 @@ if scrape_button:
     elif not acknowledge:
         st.error("Confirm policy and authorization before collecting reviews.")
     else:
+        # A failed new run must not leave a previous collection looking current.
+        st.session_state.reviews = pd.DataFrame(columns=REVIEW_COLUMNS)
+        st.session_state.uploaded_file_name = None
         with st.spinner("Checking robots.txt and reading public review cards…"):
             try:
                 scraped = scrape_reviews(
@@ -163,11 +166,15 @@ if scrape_button:
                 st.session_state.reviews = scraped
                 st.success(f"Collected {len(scraped):,} unique public reviews.")
             except (ValueError, PermissionError, RuntimeError, OSError) as exc:
-                st.error(f"Collection stopped: {exc}")
+                st.error(
+                    f"Collection stopped: {exc} Previous results were cleared to avoid "
+                    "showing stale reviews. Use an authorized saved page or CSV if available."
+                )
             except WebDriverException as exc:
                 st.error(
                     f"Browser collection failed: {exc}. Check Chrome availability and stop if "
-                    "the site is blocking access; do not bypass the block."
+                    "the site is blocking access; do not bypass the block. Previous results "
+                    "were cleared to avoid showing stale reviews."
                 )
 
 raw_reviews = st.session_state.reviews.copy()

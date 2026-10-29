@@ -3,6 +3,7 @@ from pathlib import Path
 import pandas as pd
 from streamlit.testing.v1 import AppTest
 
+import src.bestbuy_reviews as bestbuy_reviews
 from src.bestbuy_reviews import REVIEW_COLUMNS
 
 
@@ -73,3 +74,25 @@ def test_dashboard_renders_saved_html_review_upload_option():
     upload_labels = [uploader.label for uploader in app.get("file_uploader")]
     assert "Upload an existing review CSV" in upload_labels
     assert "Or upload browser-saved Best Buy review pages" in upload_labels
+
+
+def test_failed_collection_clears_previous_reviews(monkeypatch):
+    def fail_collection(*args, **kwargs):
+        raise PermissionError("Best Buy denied this browser session.")
+
+    monkeypatch.setattr(bestbuy_reviews, "scrape_reviews", fail_collection)
+    app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py")).run(
+        timeout=120
+    )
+    app.session_state["reviews"] = pd.DataFrame(
+        [{"review_text": "Previous successful collection"}],
+        columns=["review_text"],
+    )
+    app.session_state["uploaded_file_name"] = None
+    app.checkbox[1].check()
+    app.button[0].click()
+    app.run(timeout=120)
+
+    assert not app.exception
+    assert app.session_state["reviews"].empty
+    assert any("Previous results were cleared" in error.value for error in app.error)

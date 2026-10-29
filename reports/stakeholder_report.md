@@ -48,6 +48,7 @@ Recommendations for follow-up:
 - Collection used a direct Best Buy Canada product review page and ordinary visible sort and Show More controls.
 - All five requested sort choices were available and accepted in the browser. Each sort view reached 171 visible cards using ordinary Show More controls; the deliverable contains their 171-record deduplicated set.
 - A fresh Selenium session on the Dell URL returned HTTP 403; an earlier local run encountered a consent overlay without a visible Reject All control. The collector stops when it encounters a blocked/ambiguous consent control, access denial, CAPTCHA, or rate limit.
+- If a new live collection fails, the app now clears any prior review results before showing the failure, preventing an old dataset from appearing to be the result of the failed run.
 - When standalone Selenium is denied, save the rendered review page after using Best Buy's visible controls and upload the HTML to the app. The Beautiful Soup parser validates required fields and deduplicates overlapping sort views.
 - Use a visible site-provided consent option when present. If no valid visible choice is available, stop and ask the site owner or use an authorized route.
 - Use bounded page actions and respectful pauses. On transient network errors, retry only within conservative limits and stop if the site continues to deny access; do not use retries to evade a block.
