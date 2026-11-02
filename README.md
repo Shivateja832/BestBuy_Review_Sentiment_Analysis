@@ -6,7 +6,6 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 
 - Application: implemented and locally testable.
 - Genuine review sample: 171 unique visible reviews collected from a Best Buy Canada Dell laptop listing on 2026-10-28 and analyzed locally.
-- Recruiter-style evaluation: **94/100 estimate** against the assignment areas. The report explains the score calculation, earlier inconsistent scoring, and remaining Best Buy live-collection verification limits. This is not a guaranteed recruiter-issued score.
 - Data quality: all 171 records have source-provided titles and non-empty assignment fields. The page did not expose a stable review ID, so deterministic SHA-256 primary keys are used.
 - Live page verification: the listing displayed 172 reviews. Through the ordinary visible page controls, all five requested sort views were selected and Show More loaded 171 visible cards in each view until the control disappeared. This verifies the site UI, not the packaged Selenium run.
 - Supported fallback: the app can parse browser-saved Best Buy review-page HTML with Beautiful Soup. The visible page is saved after sort selection and Show More pagination; multiple HTML views are deduplicated and validated before analysis.
