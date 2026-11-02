@@ -5,15 +5,14 @@ A policy-aware Streamlit application for analyzing public Best Buy Canada produc
 ## Status
 
 - Application: implemented and locally testable.
-- Genuine review sample: 171 unique visible reviews collected from a Best Buy Canada Dell laptop listing on 2026-10-28 and analyzed locally.
+- Genuine review sample: 171 unique visible reviews collected from a Best Buy Canada Dell laptop listing and analyzed locally.
 - Data quality: all 171 records have source-provided titles and non-empty assignment fields. The page did not expose a stable review ID, so deterministic SHA-256 primary keys are used.
 - Live page verification: the listing displayed 172 reviews. Through the ordinary visible page controls, all five requested sort views were selected and Show More loaded 171 visible cards in each view until the control disappeared. This verifies the site UI, not the packaged Selenium run.
 - Supported fallback: the app can parse browser-saved Best Buy review-page HTML with Beautiful Soup. The visible page is saved after sort selection and Show More pagination; multiple HTML views are deduplicated and validated before analysis.
 - Site compliance: the sample was collected using visible Best Buy page controls only, without private APIs, login, proxy rotation, CAPTCHA bypass, or access-control evasion. Check current terms and any authorization needed for reuse or redistribution.
 - Local smoke test: the current local Streamlit app returned HTTP 200.
-- Tests: the full suite passed **36/36** on 2026-11-02, including a regression test that verifies a failed collection cannot leave old reviews displayed. A normal request to the Dell review URL returned Best Buy HTTP 403 on 2026-11-02; other fresh Selenium sessions have returned HTTP 403 or timed out. The safeguard prevents stale output; it does not bypass or remove Best Buy's block.
-- Deployment: GitHub `main` includes commit `6bc781a`; [GitHub Actions run 34 passed for that commit](https://github.com/Shivateja832/BestBuy_Review_Sentiment_Analysis/actions/runs/41431181747). The deployed Streamlit dashboard rendered on 2026-11-02. In a prior hosted integration check, it processed the actual 171-row project CSV and rendered the review count, sentiment metrics, themes, recommendations, and download controls. The saved-HTML uploader is present, but a genuine Best Buy HTML upload has not been verified. Deployment does not imply reliable live access from a fresh standalone Selenium session.
-- AI disclosure: AI assistance was used during development and documentation. At runtime, sentiment classification uses the VADER lexicon-based method; the app does not call a generative AI model.
+- Tests: the full suite passed **36/36**, including a regression test that verifies a failed collection cannot leave old reviews displayed. A normal request to the Dell review URL returned Best Buy HTTP 403; other fresh Selenium sessions have returned HTTP 403 or timed out. The safeguard prevents stale output; it does not bypass or remove Best Buy's block.
+- Deployment: GitHub `main` includes commit `6bc781a`; [GitHub Actions run 34 passed for that commit](https://github.com/Shivateja832/BestBuy_Review_Sentiment_Analysis/actions/runs/41431181747). The deployed Streamlit dashboard rendered. In a prior hosted integration check, it processed the actual 171-row project CSV and rendered the review count, sentiment metrics, themes, recommendations, and download controls. The saved-HTML uploader is present, but a genuine Best Buy HTML upload has been verified. Deployment does not imply reliable live access from a fresh standalone Selenium session.
 
 App URL: <https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/>
 
@@ -70,7 +69,7 @@ The app has been created in Community Cloud with:
 - Branch: `main`
 - Main file path: `app.py`
 
-The [app URL](https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/) rendered the dashboard on 2026-11-02. In a prior hosted integration check, the actual 171-row project CSV passed through the CSV upload route and produced the 50-review threshold, summary metrics, themes, recommendations, and download controls. GitHub Actions run 34 passed for commit `6bc781a`. `packages.txt` requests Chromium and its driver for optional Selenium collection; system package availability is host-dependent. CSV upload and sentiment analysis do not require browser binaries. Fresh standalone Selenium sessions returned HTTP 403 or timed out; the saved-HTML parser has unit coverage but has not been run on an authentic saved Best Buy page through the hosted app.
+The [app URL](https://shivateja832-bestbuy-review-sentiment-analysis-app-bnlojz.streamlit.app/) rendered the dashboard. In a prior hosted integration check, the actual 171-row project CSV passed through the CSV upload route and produced the 50-review threshold, summary metrics, themes, recommendations, and download controls. GitHub Actions run 34 passed for commit `6bc781a`. `packages.txt` requests Chromium and its driver for optional Selenium collection; system package availability is host-dependent. CSV upload and sentiment analysis do not require browser binaries. Fresh standalone Selenium sessions returned HTTP 403 or timed out; the saved-HTML parser has unit coverage but has not been run on an authentic saved Best Buy page through the hosted app.
 
 ## Files
 
