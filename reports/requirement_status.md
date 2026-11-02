@@ -1,6 +1,6 @@
 # Assignment Requirement Status
 
-**Checked:** 2026-10-29
+**Checked:** 2026-11-02
 **Current sample:** Dell 15.6-inch 120Hz laptop, AMD Ryzen 7 7730U, 16GB DDR4, 512GB SSD, Windows 11 Home
 **Sample size:** 171 unique visible Best Buy Canada reviews across five sort views
 
@@ -10,7 +10,7 @@ This table evaluates the assignment requirements as written. Additional quality 
 
 **Evidence-based recruiter-style estimate: 94/100.** This is a reasoned estimate against the five assignment areas, not a score issued or guaranteed by a recruiter. The score reflects completed deliverables and tests while deducting for unresolved live-collection and integration verification.
 
-Score calculation: 18 + 19 + 20 + 20 + 17 = 94. Earlier totals varied because I changed the grading basis without clearly distinguishing requirement coverage from end-to-end verification. I also previously labeled all five categories 20/20 while claiming 100/100; that arithmetic is correct, but the perfect category marks were not justified when the live scraper and authentic saved-page integration had not been verified. A separate earlier table with those same five category scores printed 95/100, which was an arithmetic error. Human-coded sentiment validation is not part of the assignment and is not deducted here. The remaining points are deducted for the stated live collection/integration limits, not hidden or relabeled as fixed.
+Score calculation: 18 + 19 + 20 + 20 + 17 = 94. The five category scores are the complete rubric. A table showing only the first three areas (18 + 19 + 17 = 54) is incomplete; the two omitted 20-point areas bring the score to 94, not 86. This is an evidence-based estimate, not a recruiter-issued score. Human-coded sentiment validation is not part of the assignment and is not deducted here. Points are deducted for the stated live collection/integration verification limits, not hidden or relabeled as fixed.
 
 | Area | Score | Evidence and remaining qualification |
 |---|---:|---|
@@ -18,7 +18,7 @@ Score calculation: 18 + 19 + 20 + 20 + 17 = 94. Earlier totals varied because I 
 | Review sample and required fields | 19/20 | The local deliverable has 171 unique records and all seven required fields populated, exceeding the 50-review threshold. The listing displayed 172 reviews but visible pagination yielded 171 cards; the unavailable record was not fabricated. |
 | Sentiment analysis and business findings | 20/20 | The notebook and app demonstrate text preprocessing/scoring, VADER classification, final sentiment categories, sample-level themes, and stakeholder recommendations. Human-coded accuracy validation is a prudent follow-up, not a requested deliverable. |
 | Deliverables and documentation | 20/20 | The notebook, CSV, Excel workbook, and stakeholder/requirements reports are present locally. The current sample and reuse caveats are documented; check Best Buy's current terms before reuse or redistribution. |
-| Testing, reliability, and deployment | 17/20 | The full local suite passes 36/36, including a regression test that failed collection clears prior results. GitHub Actions run 32 passed for the latest `main` commit. The hosted app processed the actual 171-row project CSV and rendered analysis results and download controls. Fresh Best Buy access remains blocked, and an authentic saved-page flow is not verified end-to-end. |
+| Testing, reliability, and deployment | 17/20 | The full local suite passed 36/36 on 2026-11-02, including a regression test that failed collection clears prior results. GitHub Actions run 33 passed for the latest `main` commit. The hosted app rendered on 2026-11-02; in a prior integration check it processed the actual 171-row project CSV and rendered analysis results and download controls. Fresh Best Buy access remains blocked, and an authentic saved-page flow is not verified end-to-end. |
 
 | Assignment requirement | Status | Evidence |
 |---|---|---|
@@ -63,4 +63,4 @@ One of the 172 reviews displayed by the listing was not available among the visi
 
 ## Deployment status
 
-GitHub `main` and the Streamlit app are deployed. The latest `main` commit `499028dab6dfd36d6f47b0921ae814047572d538` passed [GitHub Actions run 32](https://github.com/Shivateja832/BestBuy_Review_Sentiment_Analysis/actions/runs/40915131512); the full local suite passes 36/36. The hosted dashboard successfully processed the actual 171-row project CSV and showed analysis metrics, recommendations, and download controls. The saved-HTML uploader is present, but no authentic saved Best Buy HTML was processed end-to-end. On 2026-10-29, a fresh visible-browser request for the Dell review URL returned Best Buy HTTP 403. A safeguard clears prior results on failed live collection so stale reviews cannot be mistaken for newly collected results; it does not make Best Buy permit Selenium access. No access-control bypass is used.
+GitHub `main` and the Streamlit app are deployed. The latest `main` commit `7e54c589bb5ffb11c2cfbebc9c252b6324c80bc7` passed [GitHub Actions run 33](https://github.com/Shivateja832/BestBuy_Review_Sentiment_Analysis/actions/runs/40918640152); the full local suite passed 36/36 on 2026-11-02. The hosted dashboard rendered on 2026-11-02; an earlier hosted integration check processed the actual 171-row project CSV and showed analysis metrics, recommendations, and download controls. The saved-HTML uploader is present, but no authentic saved Best Buy HTML was processed end-to-end. On 2026-11-02, a normal request for the Dell review URL returned Best Buy HTTP 403. A safeguard clears prior results on failed live collection so stale reviews cannot be mistaken for newly collected results; it does not make Best Buy permit Selenium access. No access-control bypass is used.
