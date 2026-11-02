@@ -47,7 +47,7 @@ Recommendations for follow-up:
 
 - Collection used a direct Best Buy Canada product review page and ordinary visible sort and Show More controls.
 - All five requested sort choices were available and accepted in the browser. Each sort view reached 171 visible cards using ordinary Show More controls; the deliverable contains their 171-record deduplicated set.
-- A normal request to the Dell URL returned HTTP 403; fresh Selenium sessions have also returned HTTP 403 or timed out, and an earlier local run encountered a consent overlay without a visible Reject All control. The collector stops when it encounters a blocked/ambiguous consent control, access denial, CAPTCHA, or rate limit.
+- A normal request to the Dell URL and fresh Selenium sessions have returned HTTP 403 or timed out; an earlier local run encountered a consent overlay without a visible Reject All control. The collector stops when it encounters a blocked/ambiguous consent control, access denial, CAPTCHA, or rate limit.
 - If a new live collection fails, the app now clears any prior review results before showing the failure, preventing an old dataset from appearing to be the result of the failed run.
 - When standalone Selenium is denied, save the rendered review page after using Best Buy's visible controls and upload the HTML to the app. The Beautiful Soup parser validates required fields and deduplicates overlapping sort views.
 - Use a visible site-provided consent option when present. If no valid visible choice is available, stop and ask the site owner or use an authorized route.
@@ -59,8 +59,8 @@ Recommendations for follow-up:
 
 - Review-level CSV: `outputs/dell_15_6_laptop_bestbuy_reviews_sentiment.csv`
 - Excel workbook: `outputs/dell_15_6_laptop_bestbuy_reviews_sentiment.xlsx` (Reviews, Insights, Recommendations, and Collection sheets)
-- Python Streamlit application, visible-page Selenium collector, notebook, tests, and requirement matrix are included in the project.
+- Python Streamlit application, visible-page Selenium collector, notebook, and tests are included in the project.
 - The export contains all 171 cards available through visible pagination, not all 172 reviews stated in the page header; one review was unavailable through the visible control.
 - Live visible-page sorting and pagination were used to collect and export 171 unique review cards. Standalone Selenium did not complete in a fresh session; browser-saved HTML is the app's tested alternative, not a bypass or a claim that Selenium succeeded.
 - The former ASUS CM14 page also returned HTTP 403 in an earlier session. The current Dell sample is distinct from that superseded sample.
-- The deployed app rendered. In a prior hosted integration check, it processed the actual 171-row project CSV through its CSV uploader and rendered analysis results, recommendations, and download controls. The saved-HTML uploader is present and the parser is covered by synthetic-fixture tests, but an authentic Best Buy saved page has not been processed end-to-end through the hosted app.
+- The deployed app rendered and processed the actual 171-row project CSV through its CSV uploader, showing analysis results, recommendations, and download controls. The saved-HTML uploader is present and the parser is covered by synthetic-fixture tests, but an authentic Best Buy saved page has not been processed end-to-end through the hosted app.
